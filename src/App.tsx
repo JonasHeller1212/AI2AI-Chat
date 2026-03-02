@@ -53,7 +53,8 @@ function App() {
     );
   }
 
-  return <LandingPage onAuthClick={() => setView('auth')} />;
+  // If already logged in, "Get Started" goes straight to the app
+  return <LandingPage onAuthClick={() => session ? setView('app') : setView('auth')} isAuthenticated={!!session} />;
 }
 
 export default App;

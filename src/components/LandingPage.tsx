@@ -7,12 +7,13 @@ import { AcademicCTA } from './AcademicCTA';
 
 interface LandingPageProps {
   onAuthClick: () => void;
+  isAuthenticated: boolean;
 }
 
-export function LandingPage({ onAuthClick }: LandingPageProps) {
+export function LandingPage({ onAuthClick, isAuthenticated }: LandingPageProps) {
   return (
     <div className="min-h-screen bg-gradient-to-b from-indigo-50 via-white to-emerald-50">
-      <Navigation onAuthClick={onAuthClick} />
+      <Navigation onAuthClick={onAuthClick} isAuthenticated={isAuthenticated} />
       <HeroSection onAuthClick={onAuthClick} />
       <ResearchAreas />
       <ResearchFocus />

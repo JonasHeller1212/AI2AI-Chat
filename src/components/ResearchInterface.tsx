@@ -9,6 +9,7 @@ import { ErrorDisplay } from './ErrorDisplay';
 import { ChatPanel } from './ChatPanel';
 import { AIConfigPanel } from './AIConfigPanel';
 import { UserSettings } from './UserSettings';
+import { ConversationHistory } from './ConversationHistory';
 
 interface ResearchInterfaceProps {
   onSignOut: () => Promise<void>;
@@ -32,6 +33,7 @@ export function ResearchInterface({ onSignOut, onBack, user }: ResearchInterface
 
   const [showSettings, setShowSettings] = useState(true);
   const [showUserSettings, setShowUserSettings] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
 
   const [model1, setModel1] = useState<AIModel>(saved?.model1 ?? 'gpt4');
   const [model2, setModel2] = useState<AIModel>(saved?.model2 ?? 'gpt4');
@@ -84,9 +86,10 @@ export function ResearchInterface({ onSignOut, onBack, user }: ResearchInterface
     return all.length === 0;
   };
 
-  const saveMessageToDb = (conversationId: string, msg: Message, modelLabel: string) => {
+  const saveMessageToDb = (conversationId: string, msg: Message, role: string, modelLabel: string) => {
     supabase.from('messages').insert({
       conversation_id: conversationId,
+      role,
       model: modelLabel,
       content: msg.content,
       word_count: msg.wordCount ?? 0,
@@ -106,7 +109,7 @@ export function ResearchInterface({ onSignOut, onBack, user }: ResearchInterface
       setMessages(prev => [...prev, response]);
 
       if (conversationId) {
-        saveMessageToDb(conversationId, response, isFirstAI ? botName1 : botName2);
+        saveMessageToDb(conversationId, response, 'assistant', isFirstAI ? botName1 : botName2);
       }
 
       if (autoInteract && currentCount < MAX_INTERACTIONS) {
@@ -149,16 +152,29 @@ export function ResearchInterface({ onSignOut, onBack, user }: ResearchInterface
     setIsLoading(true);
     setInteractionCount(0);
 
+    // Create conversation record with title = first 80 chars of user message
     let conversationId: string | null = null;
     const { data } = await supabase.from('conversations').insert({
       user_id: user.id,
+      title: newUserMessage.content.slice(0, 80),
       model1_type: model1, model1_version: modelVersion1,
       model1_temperature: temperature1, model1_max_tokens: maxTokens1,
       model2_type: model2, model2_version: modelVersion2,
       model2_temperature: temperature2, model2_max_tokens: maxTokens2,
       interaction_limit: MAX_INTERACTIONS
     }).select('id').single();
-    if (data) conversationId = data.id;
+
+    if (data) {
+      conversationId = data.id;
+      // Save the user's opening message so history is complete
+      supabase.from('messages').insert({
+        conversation_id: conversationId,
+        role: 'user',
+        model: 'User',
+        content: newUserMessage.content,
+        word_count: newUserMessage.content.split(/\s+/).filter(Boolean).length
+      }).then(() => {});
+    }
 
     try {
       const config1: ChatConfig = {
@@ -202,11 +218,20 @@ export function ResearchInterface({ onSignOut, onBack, user }: ResearchInterface
         onSignOut={onSignOut}
         onToggleSettings={() => setShowSettings(!showSettings)}
         onOpenUserSettings={() => setShowUserSettings(true)}
+        onOpenHistory={() => setShowHistory(true)}
         user={user}
       />
 
       {showUserSettings && (
         <UserSettings user={user} onClose={() => setShowUserSettings(false)} />
+      )}
+
+      {showHistory && (
+        <ConversationHistory
+          userId={user.id}
+          onClose={() => setShowHistory(false)}
+          onLoad={(loaded) => setMessages(loaded)}
+        />
       )}
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
