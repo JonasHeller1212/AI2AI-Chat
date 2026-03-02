@@ -2,12 +2,14 @@ import { APIProvider, APIConfig, APIResponse } from '../types';
 
 export class AnthropicProvider implements APIProvider {
   async makeRequest(config: APIConfig, messages: Array<{role: string; content: string}>): Promise<APIResponse> {
-    // Convert messages to Anthropic format
-    const prompt = messages.map(msg => {
-      if (msg.role === 'user') return `Human: ${msg.content}`;
-      if (msg.role === 'assistant') return `Assistant: ${msg.content}`;
-      return msg.content;
-    }).join('\n\n');
+    const systemText = messages
+      .filter(m => m.role === 'system')
+      .map(m => m.content)
+      .join('\n');
+
+    const chatMessages = messages
+      .filter(m => m.role !== 'system')
+      .map(m => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: m.content }));
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -18,7 +20,8 @@ export class AnthropicProvider implements APIProvider {
       },
       body: JSON.stringify({
         model: config.model,
-        messages: [{ role: 'user', content: prompt }],
+        messages: chatMessages,
+        ...(systemText ? { system: systemText } : {}),
         max_tokens: config.maxTokens,
         temperature: config.temperature
       })

@@ -2,22 +2,31 @@ import { APIProvider, APIConfig, APIResponse } from '../types';
 
 export class GeminiProvider implements APIProvider {
   async makeRequest(config: APIConfig, messages: Array<{role: string; content: string}>): Promise<APIResponse> {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/${config.model}:generateContent?key=${config.apiKey}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        contents: messages.map(msg => ({
-          role: msg.role === 'user' ? 'user' : 'model',
-          parts: [{ text: msg.content }]
-        })),
-        generationConfig: {
-          temperature: config.temperature,
-          maxOutputTokens: config.maxTokens
-        }
-      })
-    });
+    const systemText = messages
+      .filter(m => m.role === 'system')
+      .map(m => m.content)
+      .join('\n');
+
+    const chatMessages = messages.filter(m => m.role !== 'system');
+
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${config.model}:generateContent?key=${config.apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: chatMessages.map(msg => ({
+            role: msg.role === 'user' ? 'user' : 'model',
+            parts: [{ text: msg.content }]
+          })),
+          ...(systemText ? { systemInstruction: { parts: [{ text: systemText }] } } : {}),
+          generationConfig: {
+            temperature: config.temperature,
+            maxOutputTokens: config.maxTokens
+          }
+        })
+      }
+    );
 
     if (!response.ok) {
       const error = await response.json();
