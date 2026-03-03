@@ -54,7 +54,7 @@ export function ConversationDisplay({
 
   if (visible.length === 0 && !isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 text-gray-400">
+      <div className="flex flex-col items-center justify-center py-16 text-gray-400 dark:text-gray-500">
         <Bot className="w-12 h-12 mb-3" />
         <p className="text-sm">Send a message (or leave blank) to start the conversation.</p>
       </div>
@@ -86,9 +86,9 @@ export function ConversationDisplay({
 
         const repDivider = showRepDivider ? (
           <div key={`rep-${message.id}`} className="flex items-center gap-3 py-1">
-            <div className="flex-1 h-px bg-gray-200" />
-            <span className="text-xs text-gray-400 font-medium px-2">Run {repNum}</span>
-            <div className="flex-1 h-px bg-gray-200" />
+            <div className="flex-1 h-px bg-gray-200 dark:bg-gray-600" />
+            <span className="text-xs text-gray-400 dark:text-gray-500 font-medium px-2">Run {repNum}</span>
+            <div className="flex-1 h-px bg-gray-200 dark:bg-gray-600" />
           </div>
         ) : null;
 
@@ -97,18 +97,18 @@ export function ConversationDisplay({
             <React.Fragment key={message.id}>
               {repDivider}
               <div
-                className="flex flex-col gap-2 p-4 rounded-xl shadow-sm bg-white border border-gray-200 mr-12"
+                className="flex flex-col gap-2 p-4 rounded-xl shadow-sm bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 mr-12"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <User className="w-4 h-4 text-gray-500" />
-                    <span className="text-sm font-semibold text-gray-700">{label}</span>
+                    <User className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                    <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">{label}</span>
                   </div>
-                  <span className="text-xs text-gray-400">
+                  <span className="text-xs text-gray-400 dark:text-gray-500">
                     {new Date(message.timestamp).toLocaleTimeString()}
                   </span>
                 </div>
-                <p className="text-gray-800 text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>
+                <p className="text-gray-800 dark:text-gray-200 text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>
               </div>
             </React.Fragment>
           );
@@ -147,7 +147,7 @@ export function ConversationDisplay({
       })}
 
       {isLoading && (
-        <div className="flex items-center gap-2 ml-12 text-sm text-gray-400">
+        <div className="flex items-center gap-2 ml-12 text-sm text-gray-400 dark:text-gray-500">
           <div className="flex gap-1">
             <span className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
             <span className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />

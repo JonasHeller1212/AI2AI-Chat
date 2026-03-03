@@ -122,22 +122,22 @@ export function ConversationHistory({ userId, onClose, onLoad }: ConversationHis
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex">
-      <div className="ml-auto w-full max-w-3xl bg-white h-full flex flex-col shadow-2xl">
-        <div className="flex items-center justify-between px-6 py-4 border-b">
+      <div className="ml-auto w-full max-w-3xl bg-white dark:bg-gray-900 h-full flex flex-col shadow-2xl">
+        <div className="flex items-center justify-between px-6 py-4 border-b dark:border-gray-700">
           <div className="flex items-center gap-2">
-            <Clock className="w-5 h-5 text-indigo-600" />
-            <h2 className="text-lg font-semibold text-gray-900">Conversation History</h2>
+            <Clock className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Conversation History</h2>
           </div>
-          <button onClick={onClose} className="p-1 text-gray-400 hover:text-gray-600 rounded-lg">
+          <button onClick={onClose} className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 rounded-lg">
             <X className="w-5 h-5" />
           </button>
         </div>
 
         <div className="flex flex-1 overflow-hidden">
           {/* List */}
-          <div className="w-72 border-r flex flex-col overflow-y-auto">
+          <div className="w-72 border-r dark:border-gray-700 flex flex-col overflow-y-auto">
             {loading ? (
-              <div className="flex items-center justify-center py-12 text-gray-400">
+              <div className="flex items-center justify-center py-12 text-gray-400 dark:text-gray-500">
                 <Loader2 className="w-5 h-5 animate-spin" />
               </div>
             ) : loadError ? (
@@ -146,7 +146,7 @@ export function ConversationHistory({ userId, onClose, onLoad }: ConversationHis
                 {loadError}
               </div>
             ) : conversations.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12 text-gray-400 text-sm px-6 text-center">
+              <div className="flex flex-col items-center justify-center py-12 text-gray-400 dark:text-gray-500 text-sm px-6 text-center">
                 <MessageSquare className="w-10 h-10 mb-3" />
                 No conversations yet. Start chatting to see your history here.
               </div>
@@ -157,23 +157,23 @@ export function ConversationHistory({ userId, onClose, onLoad }: ConversationHis
                   <button
                     key={conv.id}
                     onClick={() => handleSelectConversation(conv.id)}
-                    className={`w-full text-left px-4 py-3 border-b hover:bg-gray-50 transition-colors ${
-                      selectedId === conv.id ? 'bg-indigo-50 border-l-2 border-l-indigo-500' : ''
+                    className={`w-full text-left px-4 py-3 border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors ${
+                      selectedId === conv.id ? 'bg-indigo-50 dark:bg-indigo-900/20 border-l-2 border-l-indigo-500' : ''
                     }`}
                   >
                     <div className="flex items-start justify-between gap-2">
-                      <p className="text-sm font-medium text-gray-800 truncate flex-1">
+                      <p className="text-sm font-medium text-gray-800 dark:text-gray-200 truncate flex-1">
                         {conv.title ?? 'Untitled conversation'}
                       </p>
-                      <ChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0 mt-0.5" />
+                      <ChevronRight className="w-4 h-4 text-gray-400 dark:text-gray-500 flex-shrink-0 mt-0.5" />
                     </div>
-                    <div className="flex items-center gap-1.5 mt-1 text-xs text-gray-500">
+                    <div className="flex items-center gap-1.5 mt-1 text-xs text-gray-500 dark:text-gray-400">
                       <Bot className="w-3 h-3" />
                       <span>{MODEL_LABELS[conv.model1_type] ?? conv.model1_type}</span>
-                      <span className="text-gray-300">×</span>
+                      <span className="text-gray-300 dark:text-gray-600">×</span>
                       <span>{MODEL_LABELS[conv.model2_type] ?? conv.model2_type}</span>
                     </div>
-                    <div className="flex items-center justify-between mt-1 text-xs text-gray-400">
+                    <div className="flex items-center justify-between mt-1 text-xs text-gray-400 dark:text-gray-500">
                       <span>{formatDate(conv.created_at)}</span>
                       <span>{count} msg{count !== 1 ? 's' : ''}</span>
                     </div>
@@ -186,12 +186,12 @@ export function ConversationHistory({ userId, onClose, onLoad }: ConversationHis
           {/* Detail */}
           <div className="flex-1 flex flex-col overflow-hidden">
             {!selectedId ? (
-              <div className="flex flex-col items-center justify-center h-full text-gray-400 text-sm">
+              <div className="flex flex-col items-center justify-center h-full text-gray-400 dark:text-gray-500 text-sm">
                 <MessageSquare className="w-10 h-10 mb-3" />
                 Select a conversation to preview it
               </div>
             ) : loadingMessages ? (
-              <div className="flex items-center justify-center h-full text-gray-400">
+              <div className="flex items-center justify-center h-full text-gray-400 dark:text-gray-500">
                 <Loader2 className="w-5 h-5 animate-spin" />
               </div>
             ) : messagesError ? (
@@ -202,13 +202,13 @@ export function ConversationHistory({ userId, onClose, onLoad }: ConversationHis
             ) : (
               <>
                 {selected && (
-                  <div className="px-4 py-3 border-b bg-gray-50 flex items-center justify-between">
-                    <div className="text-sm text-gray-600">
-                      <span className="font-medium text-indigo-700">
+                  <div className="px-4 py-3 border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-800 flex items-center justify-between">
+                    <div className="text-sm text-gray-600 dark:text-gray-400">
+                      <span className="font-medium text-indigo-700 dark:text-indigo-400">
                         {MODEL_LABELS[selected.model1_type] ?? selected.model1_type} ({selected.model1_version})
                       </span>
-                      <span className="mx-2 text-gray-400">vs</span>
-                      <span className="font-medium text-emerald-700">
+                      <span className="mx-2 text-gray-400 dark:text-gray-500">vs</span>
+                      <span className="font-medium text-emerald-700 dark:text-emerald-400">
                         {MODEL_LABELS[selected.model2_type] ?? selected.model2_type} ({selected.model2_version})
                       </span>
                     </div>
@@ -226,19 +226,19 @@ export function ConversationHistory({ userId, onClose, onLoad }: ConversationHis
                       key={msg.id}
                       className={`p-3 rounded-xl text-sm ${
                         msg.role === 'user'
-                          ? 'bg-white border border-gray-200 mr-8'
-                          : 'bg-indigo-50 border border-indigo-100 ml-8'
+                          ? 'bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 mr-8'
+                          : 'bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800 ml-8'
                       }`}
                     >
                       <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs font-semibold text-gray-600">
+                        <span className="text-xs font-semibold text-gray-600 dark:text-gray-400">
                           {msg.model || (msg.role === 'user' ? 'User' : 'Assistant')}
                         </span>
-                        <span className="text-xs text-gray-400">
+                        <span className="text-xs text-gray-400 dark:text-gray-500">
                           {new Date(msg.created_at).toLocaleTimeString()}
                         </span>
                       </div>
-                      <p className="text-gray-800 whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                      <p className="text-gray-800 dark:text-gray-200 whitespace-pre-wrap leading-relaxed">{msg.content}</p>
                     </div>
                   ))}
                 </div>

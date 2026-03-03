@@ -15,6 +15,8 @@ interface ResearchInterfaceProps {
   onSignOut: () => Promise<void>;
   onBack: () => void;
   user: User;
+  isDarkMode: boolean;
+  onToggleDarkMode: () => void;
 }
 
 const STORAGE_KEY = 'ai2ai_settings';
@@ -28,7 +30,7 @@ function loadSettings() {
   }
 }
 
-export function ResearchInterface({ onSignOut, onBack, user }: ResearchInterfaceProps) {
+export function ResearchInterface({ onSignOut, onBack, user, isDarkMode, onToggleDarkMode }: ResearchInterfaceProps) {
   const saved = loadSettings();
 
   const [showSettings, setShowSettings] = useState(true);
@@ -411,7 +413,7 @@ export function ResearchInterface({ onSignOut, onBack, user }: ResearchInterface
   };
 
   return (
-    <div className="h-screen bg-gray-100 flex flex-col overflow-hidden">
+    <div className="h-screen bg-gray-100 dark:bg-gray-950 flex flex-col overflow-hidden">
       <Header
         onBack={onBack}
         onSignOut={onSignOut}
@@ -419,6 +421,8 @@ export function ResearchInterface({ onSignOut, onBack, user }: ResearchInterface
         onOpenUserSettings={() => setShowUserSettings(true)}
         onOpenHistory={() => setShowHistory(true)}
         user={user}
+        isDarkMode={isDarkMode}
+        onToggleDarkMode={onToggleDarkMode}
       />
 
       {showUserSettings && (
@@ -426,6 +430,7 @@ export function ResearchInterface({ onSignOut, onBack, user }: ResearchInterface
           user={user}
           onClose={() => setShowUserSettings(false)}
           onOpenHistory={() => { setShowUserSettings(false); setShowHistory(true); }}
+          onDataDeleted={() => { setMessages([]); setShowUserSettings(false); }}
         />
       )}
 
