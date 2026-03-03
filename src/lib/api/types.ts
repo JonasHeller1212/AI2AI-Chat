@@ -28,3 +28,16 @@ export interface APIConfig {
 export interface APIProvider {
   makeRequest: (config: APIConfig, messages: Array<{role: string; content: string}>) => Promise<APIResponse>;
 }
+
+/** Error thrown by providers when the HTTP response is not OK. */
+export class APIError extends Error {
+  constructor(
+    message: string,
+    public readonly status: number,
+    /** Seconds to wait before retrying, from the Retry-After header (if present). */
+    public readonly retryAfter?: number,
+  ) {
+    super(message);
+    this.name = 'APIError';
+  }
+}
