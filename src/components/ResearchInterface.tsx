@@ -11,6 +11,7 @@ import { ChatPanel } from './ChatPanel';
 import { AIConfigPanel } from './AIConfigPanel';
 import { UserSettings } from './UserSettings';
 import { ConversationHistory } from './ConversationHistory';
+import { OnboardingTour } from './OnboardingTour';
 
 interface ResearchInterfaceProps {
   onSignOut: () => Promise<void>;
@@ -37,6 +38,7 @@ export function ResearchInterface({ onSignOut, onBack, user, isDarkMode, onToggl
   const [showSettings, setShowSettings] = useState(true);
   const [showUserSettings, setShowUserSettings] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const [showTour, setShowTour] = useState(() => !localStorage.getItem('ai2ai_tour_done'));
 
   const [model1, setModel1] = useState<AIModel>(saved?.model1 ?? 'gpt4');
   const [model2, setModel2] = useState<AIModel>(saved?.model2 ?? 'gpt4');
@@ -421,6 +423,7 @@ export function ResearchInterface({ onSignOut, onBack, user, isDarkMode, onToggl
 
   return (
     <div className="h-screen bg-gray-100 dark:bg-gray-950 flex flex-col overflow-hidden">
+      {showTour && <OnboardingTour onComplete={() => setShowTour(false)} />}
       <Header
         onBack={onBack}
         onSignOut={onSignOut}
@@ -452,7 +455,7 @@ export function ResearchInterface({ onSignOut, onBack, user, isDarkMode, onToggl
       <main className="flex-1 min-h-0 w-full px-4 sm:px-6 lg:px-8 py-6 overflow-hidden">
         <div className="flex gap-4 h-full min-h-0">
           {showSettings && (
-            <div className="hidden lg:flex lg:flex-col w-88 flex-shrink-0 overflow-y-auto" style={{ width: '22rem' }}>
+            <div data-tour="bot1-panel" className="hidden lg:flex lg:flex-col w-88 flex-shrink-0 overflow-y-auto" style={{ width: '22rem' }}>
               <AIConfigPanel
                 title={botName1}
                 onTitleChange={setBotName1}
@@ -514,7 +517,7 @@ export function ResearchInterface({ onSignOut, onBack, user, isDarkMode, onToggl
           </div>
 
           {showSettings && (
-            <div className="hidden lg:flex lg:flex-col flex-shrink-0 overflow-y-auto" style={{ width: '22rem' }}>
+            <div data-tour="bot2-panel" className="hidden lg:flex lg:flex-col flex-shrink-0 overflow-y-auto" style={{ width: '22rem' }}>
               <AIConfigPanel
                 title={botName2}
                 onTitleChange={setBotName2}
