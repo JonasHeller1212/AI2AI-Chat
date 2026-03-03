@@ -1,4 +1,4 @@
-import { APIProvider, APIConfig, APIResponse } from '../types';
+import { APIProvider, APIConfig, APIResponse, APIError } from '../types';
 
 const REQUEST_TIMEOUT_MS = 30_000;
 
@@ -47,7 +47,9 @@ export class GeminiProvider implements APIProvider {
       const body = await response.text();
       let message = 'Gemini API request failed';
       try { message = JSON.parse(body).error?.message ?? message; } catch { /* non-JSON body */ }
-      throw new Error(message);
+      const retryAfterRaw = response.headers.get('Retry-After');
+      const retryAfter = retryAfterRaw ? Number(retryAfterRaw) : undefined;
+      throw new APIError(message, response.status, retryAfter);
     }
 
     const data = await response.json();

@@ -1,5 +1,15 @@
 import { Message, ChatConfig } from '../../types';
 import { createProvider } from './factory';
+import { APIError } from './types';
+
+/** HTTP status codes that are safe to retry (rate-limit / server overload). */
+const RETRYABLE_STATUSES = new Set([429, 503, 529]);
+
+/** Fallback delays (ms) for retry attempts 1 and 2 when no Retry-After header is present. */
+const FALLBACK_DELAYS_MS = [5_000, 15_000];
+
+/** Maximum number of ms we will honour from a Retry-After header. */
+const MAX_RETRY_AFTER_MS = 60_000;
 
 export async function generateResponse(
   config: ChatConfig,
@@ -17,8 +27,15 @@ export async function generateResponse(
 
   for (let attempt = 0; attempt < 3; attempt++) {
     if (attempt > 0) {
-      await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 1000));
+      // Respect Retry-After header if the previous error included one; otherwise use
+      // fixed fallback delays that are long enough for typical overload scenarios.
+      let delayMs = FALLBACK_DELAYS_MS[attempt - 1] ?? 15_000;
+      if (lastError instanceof APIError && lastError.retryAfter != null) {
+        delayMs = Math.min(lastError.retryAfter * 1000, MAX_RETRY_AFTER_MS);
+      }
+      await new Promise(resolve => setTimeout(resolve, delayMs));
     }
+
     try {
       const result = await provider.makeRequest({
         apiKey: config.apiKey,
@@ -42,6 +59,12 @@ export async function generateResponse(
       };
     } catch (error) {
       lastError = error instanceof Error ? error : new Error('Unknown error');
+
+      // For API errors with a non-retryable status (e.g. 401 auth, 400 bad request),
+      // fail immediately — retrying won't help.
+      if (error instanceof APIError && !RETRYABLE_STATUSES.has(error.status)) {
+        throw lastError;
+      }
     }
   }
 
