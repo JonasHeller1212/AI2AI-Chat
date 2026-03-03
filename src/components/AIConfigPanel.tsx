@@ -52,14 +52,17 @@ export function AIConfigPanel({
     <div className="bg-white p-6 rounded-lg shadow-sm">
       <div className="flex items-center gap-2 mb-4">
         <Bot className="w-5 h-5 text-indigo-600 flex-shrink-0" />
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => onTitleChange(e.target.value)}
-          maxLength={50}
-          className="text-lg font-medium text-gray-900 bg-transparent border-b border-transparent hover:border-gray-300 focus:border-indigo-500 focus:outline-none w-full"
-          placeholder="Bot name"
-        />
+        <div className="flex flex-col w-full">
+          <label className="text-xs font-medium text-gray-500 mb-0.5">Bot name</label>
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => onTitleChange(e.target.value)}
+            maxLength={50}
+            className="text-base font-semibold text-gray-900 bg-transparent border-b border-gray-300 focus:border-indigo-500 focus:outline-none w-full"
+            placeholder="Bot name"
+          />
+        </div>
       </div>
       <ModelConfig
         label="Model Settings"

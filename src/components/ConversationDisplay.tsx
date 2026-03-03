@@ -1,5 +1,5 @@
 import React from 'react';
-import { Message, AIModel } from '../types';
+import { Message } from '../types';
 import { Bot, User } from 'lucide-react';
 
 interface ConversationDisplayProps {
@@ -7,7 +7,6 @@ interface ConversationDisplayProps {
   isLoading?: boolean;
   botName1: string;
   botName2: string;
-  model1: AIModel;
   bubbleColor1: string;
   bubbleColor2: string;
   textColor1: string;
@@ -40,7 +39,6 @@ export function ConversationDisplay({
   isLoading = false,
   botName1,
   botName2,
-  model1,
   bubbleColor1,
   bubbleColor2,
   textColor1,
@@ -67,7 +65,7 @@ export function ConversationDisplay({
     <div className="flex flex-col gap-4">
       {visible.map((message) => {
         const isUser = message.role === 'user';
-        const isBot1 = message.role === 'assistant' && message.model === model1;
+        const isBot1 = message.role === 'assistant' && message.botIndex === 1;
         const label = isUser ? 'You' : (isBot1 ? botName1 : botName2);
 
         if (isUser) {

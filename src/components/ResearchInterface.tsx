@@ -443,7 +443,6 @@ export function ResearchInterface({ onSignOut, onBack, user }: ResearchInterface
               onResetChat={messages.length > 0 ? handleResetChat : undefined}
               botName1={botName1}
               botName2={botName2}
-              model1={model1}
               bubbleColor1={bubbleColor1}
               bubbleColor2={bubbleColor2}
               textColor1={textColor1}
