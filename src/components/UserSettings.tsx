@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
-import { X, User as UserIcon, Mail, Lock, Save, Clock, Trash2 } from 'lucide-react';
+import { X, Settings, User as UserIcon, Mail, Lock, Save, Clock, Trash2 } from 'lucide-react';
 
 interface UserSettingsProps {
   user: User;
@@ -82,8 +82,8 @@ export function UserSettings({ user, onClose, onOpenHistory, onDataDeleted }: Us
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between px-6 py-4 border-b dark:border-gray-700">
           <div className="flex items-center gap-2">
-            <UserIcon className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Account Settings</h2>
+            <Settings className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Settings</h2>
           </div>
           <button onClick={onClose} className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 rounded-lg">
             <X className="w-5 h-5" />

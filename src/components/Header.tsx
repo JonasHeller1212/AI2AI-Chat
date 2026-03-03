@@ -1,6 +1,6 @@
 import React from 'react';
 import type { User } from '@supabase/supabase-js';
-import { Settings, ArrowLeft, UserCircle, Clock, Moon, Sun } from 'lucide-react';
+import { Settings, SlidersHorizontal, ArrowLeft, UserCircle, Clock, Moon, Sun } from 'lucide-react';
 import { Logo } from './Logo';
 
 interface HeaderProps {
@@ -41,7 +41,14 @@ export function Header({ onBack, onSignOut, onToggleSettings, onOpenUserSettings
           <button
             onClick={onToggleSettings}
             className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
-            title="Toggle AI settings"
+            title="Toggle AI config panels"
+          >
+            <SlidersHorizontal className="w-5 h-5" />
+          </button>
+          <button
+            onClick={onOpenUserSettings}
+            className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
+            title="Settings"
           >
             <Settings className="w-5 h-5" />
           </button>
@@ -52,14 +59,10 @@ export function Header({ onBack, onSignOut, onToggleSettings, onOpenUserSettings
           >
             {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
           </button>
-          <button
-            onClick={onOpenUserSettings}
-            className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
-            title="Account settings"
-          >
-            <UserCircle className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+          <div className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 dark:text-gray-400">
+            <UserCircle className="w-5 h-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0" />
             <span className="hidden sm:block max-w-[120px] truncate">{displayName}</span>
-          </button>
+          </div>
           <button
             onClick={onSignOut}
             className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
