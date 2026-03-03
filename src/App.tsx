@@ -12,6 +12,20 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState<View>('landing');
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signup');
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
+    const stored = localStorage.getItem('ai2ai_theme');
+    if (stored) return stored === 'dark';
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  });
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    localStorage.setItem('ai2ai_theme', isDarkMode ? 'dark' : 'light');
+  }, [isDarkMode]);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -43,7 +57,7 @@ function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center dark:bg-gray-950">
         <div className="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -59,6 +73,8 @@ function App() {
         onSignOut={handleSignOut}
         onBack={() => setView('landing')}
         user={session.user}
+        isDarkMode={isDarkMode}
+        onToggleDarkMode={() => setIsDarkMode(v => !v)}
       />
     );
   }

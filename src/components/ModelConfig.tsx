@@ -102,11 +102,11 @@ export function ModelConfig({
   return (
     <div className={`space-y-4 ${disabled ? 'opacity-50' : ''}`}>
       <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-700">AI Provider</label>
+        <label className="text-sm font-medium text-gray-700 dark:text-gray-200">AI Provider</label>
         <select
           value={model}
           onChange={(e) => handleProviderChange(e.target.value as AIModel)}
-          className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+          className="w-full p-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-sm text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
           disabled={disabled}
         >
           {(Object.keys(PROVIDER_LABELS) as AIModel[]).map((m) => (
@@ -117,10 +117,10 @@ export function ModelConfig({
 
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <label className="text-sm font-medium text-gray-700">API Key</label>
+          <label className="text-sm font-medium text-gray-700 dark:text-gray-200">API Key</label>
           <button
             type="button"
-            className="inline-flex items-center px-3 py-1 text-xs text-indigo-600 hover:text-indigo-500 hover:bg-indigo-50 rounded-full transition-colors"
+            className="inline-flex items-center px-3 py-1 text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-full transition-colors"
             onClick={() => setShowInstructions(true)}
             disabled={disabled}
           >
@@ -132,23 +132,23 @@ export function ModelConfig({
           type="password"
           value={apiKey}
           onChange={(e) => onApiKeyChange(e.target.value)}
-          className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+          className="w-full p-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-sm text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
           placeholder={API_KEY_PLACEHOLDERS[model]}
           disabled={disabled}
         />
-        <p className="text-xs text-amber-600">
+        <p className="text-xs text-amber-600 dark:text-amber-400">
           Stored in this browser only. Clear before using shared devices.
         </p>
       </div>
 
       {model === 'gpt4' && (
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Organization ID <span className="text-gray-400">(optional)</span></label>
+          <label className="text-sm font-medium text-gray-700 dark:text-gray-200">Organization ID <span className="text-gray-400 dark:text-gray-500">(optional)</span></label>
           <input
             type="text"
             value={orgId}
             onChange={(e) => onOrgIdChange(e.target.value)}
-            className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+            className="w-full p-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-sm text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
             placeholder="org-..."
             disabled={disabled}
           />
@@ -156,7 +156,7 @@ export function ModelConfig({
       )}
 
       <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-700">Model</label>
+        <label className="text-sm font-medium text-gray-700 dark:text-gray-200">Model</label>
         <select
           value={modelVersion}
           onChange={(e) => {
@@ -164,7 +164,7 @@ export function ModelConfig({
             const v = versions.find(v => v.id === e.target.value);
             if (v) onMaxTokensChange(Math.min(maxTokens, v.maxTokens));
           }}
-          className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+          className="w-full p-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-sm text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
           disabled={disabled}
         >
           {versions.map((v) => (
@@ -175,7 +175,7 @@ export function ModelConfig({
 
       <div className="space-y-2">
         <div className="flex items-center gap-1.5">
-          <label className="text-sm font-medium text-gray-700">Temperature ({temperature})</label>
+          <label className="text-sm font-medium text-gray-700 dark:text-gray-200">Temperature ({temperature})</label>
           <InfoTooltip text="Controls how random the AI's output is. 0 = deterministic and focused (always picks the most likely word). Higher values produce more varied, creative responses. Values above 1 can become incoherent." />
         </div>
         <input
@@ -185,10 +185,10 @@ export function ModelConfig({
           step="0.1"
           value={temperature}
           onChange={(e) => onTemperatureChange(Number(e.target.value))}
-          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+          className="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer accent-indigo-600"
           disabled={disabled}
         />
-        <div className="flex justify-between text-xs text-gray-400">
+        <div className="flex justify-between text-xs text-gray-400 dark:text-gray-500">
           <span>Focused</span>
           <span>Creative</span>
         </div>
@@ -196,7 +196,7 @@ export function ModelConfig({
 
       <div className="space-y-2">
         <div className="flex items-center gap-1.5">
-          <label className="text-sm font-medium text-gray-700">Max Tokens (max: {currentMax.toLocaleString()})</label>
+          <label className="text-sm font-medium text-gray-700 dark:text-gray-200">Max Tokens (max: {currentMax.toLocaleString()})</label>
           <InfoTooltip text="The maximum number of tokens (roughly ¾ of a word each) the AI can generate per response. Higher values allow longer replies but cost more and take longer. Keep it lower to get concise answers." />
         </div>
         <input
@@ -208,7 +208,7 @@ export function ModelConfig({
             const v = Number(e.target.value);
             onMaxTokensChange(Math.max(1, Math.min(v, currentMax)));
           }}
-          className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+          className="w-full p-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-sm text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
           disabled={disabled}
         />
       </div>
