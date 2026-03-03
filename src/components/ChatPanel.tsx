@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 import { Send, Download, Camera, RotateCcw, FileText, FileSpreadsheet, ChevronDown } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import { ConversationDisplay } from './ConversationDisplay';
-import { Message, AIModel } from '../types';
+import { Message } from '../types';
 
 interface ChatPanelProps {
   messages: Message[];
@@ -27,7 +27,6 @@ interface ChatPanelProps {
   onResetChat?: () => void;
   botName1: string;
   botName2: string;
-  model1: AIModel;
   bubbleColor1: string;
   bubbleColor2: string;
   textColor1: string;
@@ -57,7 +56,6 @@ export function ChatPanel({
   onResetChat,
   botName1,
   botName2,
-  model1,
   bubbleColor1,
   bubbleColor2,
   textColor1,
@@ -173,7 +171,6 @@ export function ChatPanel({
           isLoading={isLoading}
           botName1={botName1}
           botName2={botName2}
-          model1={model1}
           bubbleColor1={bubbleColor1}
           bubbleColor2={bubbleColor2}
           textColor1={textColor1}
