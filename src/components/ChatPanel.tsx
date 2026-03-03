@@ -123,7 +123,7 @@ export function ChatPanel({
   return (
     <div className="flex-1 min-h-0 bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden flex flex-col">
       {/* Header bar */}
-      <div className="flex items-center justify-between px-4 py-3 border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+      <div data-tour="chat-tabs" className="flex items-center justify-between px-4 py-3 border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
         <div className="flex items-center gap-3">
           {/* Tab switcher */}
           <div className="flex gap-0.5 border border-gray-200 dark:border-gray-600 rounded-lg p-0.5 bg-gray-100 dark:bg-gray-800">
@@ -245,7 +245,7 @@ export function ChatPanel({
 
       {/* Input area */}
       <div className="p-4 border-t dark:border-gray-700 space-y-3">
-        <div className="flex gap-3">
+        <div data-tour="chat-input" className="flex gap-3">
           <input
             type="text"
             value={userInput}
@@ -286,7 +286,7 @@ export function ChatPanel({
         </div>
 
         {/* Controls row */}
-        <div className="flex flex-wrap items-start gap-x-6 gap-y-3 text-sm text-gray-600 dark:text-gray-400">
+        <div data-tour="chat-controls" className="flex flex-wrap items-start gap-x-6 gap-y-3 text-sm text-gray-600 dark:text-gray-400">
           <label className="flex items-center gap-2 cursor-pointer">
             <input
               type="checkbox"
