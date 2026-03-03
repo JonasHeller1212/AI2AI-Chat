@@ -4,10 +4,11 @@ import { LogIn, Mail, Lock, AlertCircle, CheckCircle } from 'lucide-react';
 
 interface AuthProps {
   onAuthSuccess: () => void;
+  initialIsSignUp?: boolean;
 }
 
-export function Auth({ onAuthSuccess }: AuthProps) {
-  const [isSignUp, setIsSignUp] = useState(false);
+export function Auth({ onAuthSuccess, initialIsSignUp = false }: AuthProps) {
+  const [isSignUp, setIsSignUp] = useState(initialIsSignUp);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);

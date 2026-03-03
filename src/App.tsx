@@ -11,6 +11,7 @@ function App() {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState<View>('landing');
+  const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signup');
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -40,7 +41,7 @@ function App() {
   }
 
   if (view === 'auth') {
-    return <Auth onAuthSuccess={() => setView('app')} />;
+    return <Auth onAuthSuccess={() => setView('app')} initialIsSignUp={authMode === 'signup'} />;
   }
 
   if (view === 'app' && session) {
@@ -53,8 +54,10 @@ function App() {
     );
   }
 
-  // If already logged in, "Get Started" goes straight to the app
-  return <LandingPage onAuthClick={() => session ? setView('app') : setView('auth')} isAuthenticated={!!session} />;
+  const goToSignIn = () => { setAuthMode('signin'); setView(session ? 'app' : 'auth'); };
+  const goToSignUp = () => { setAuthMode('signup'); setView(session ? 'app' : 'auth'); };
+
+  return <LandingPage onAuthClick={goToSignIn} onSignUpClick={goToSignUp} isAuthenticated={!!session} />;
 }
 
 export default App;

@@ -3,10 +3,11 @@ import { Logo } from './Logo';
 
 interface NavigationProps {
   onAuthClick: () => void;
+  onSignUpClick: () => void;
   isAuthenticated: boolean;
 }
 
-export function Navigation({ onAuthClick, isAuthenticated }: NavigationProps) {
+export function Navigation({ onAuthClick, onSignUpClick, isAuthenticated }: NavigationProps) {
   return (
     <nav className="fixed w-full bg-white/80 backdrop-blur-sm z-50 border-b border-gray-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -22,10 +23,10 @@ export function Navigation({ onAuthClick, isAuthenticated }: NavigationProps) {
               </button>
             )}
             <button
-              onClick={onAuthClick}
+              onClick={isAuthenticated ? onAuthClick : onSignUpClick}
               className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-emerald-500 rounded-lg hover:from-indigo-500 hover:to-emerald-400 shadow-md hover:shadow-lg transition-all"
             >
-              {isAuthenticated ? 'Open App' : 'Access Research Platform'}
+              {isAuthenticated ? 'Open App' : 'Get Started'}
             </button>
           </div>
         </div>

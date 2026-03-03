@@ -29,10 +29,12 @@ const PROVIDER_MODELS: Record<AIModel, { id: string; name: string; maxTokens: nu
     { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo', maxTokens: 16384 },
   ],
   claude: [
+    { id: 'claude-sonnet-4-6', name: 'Claude Sonnet 4.6 (Latest)', maxTokens: 16000 },
+    { id: 'claude-opus-4-6', name: 'Claude Opus 4.6', maxTokens: 16000 },
+    { id: 'claude-haiku-4-5-20251001', name: 'Claude Haiku 4.5', maxTokens: 16000 },
     { id: 'claude-3-5-sonnet-20241022', name: 'Claude 3.5 Sonnet', maxTokens: 8192 },
     { id: 'claude-3-5-haiku-20241022', name: 'Claude 3.5 Haiku', maxTokens: 8192 },
     { id: 'claude-3-opus-20240229', name: 'Claude 3 Opus', maxTokens: 4096 },
-    { id: 'claude-3-sonnet-20240229', name: 'Claude 3 Sonnet', maxTokens: 4096 },
   ],
   gemini: [
     { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro', maxTokens: 8192 },
