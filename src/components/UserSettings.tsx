@@ -94,6 +94,8 @@ export function UserSettings({ user, onClose, onOpenHistory, onDataDeleted, onAc
       const { error } = await supabase.functions.invoke('delete-account');
       if (error) throw error;
       clearVault();
+      // User is already deleted server-side; sign out locally only (no server round-trip)
+      await supabase.auth.signOut({ scope: 'local' });
       onAccountDeleted?.();
     } catch (err) {
       setMessage({ text: err instanceof Error ? err.message : 'Failed to delete account', type: 'error' });
