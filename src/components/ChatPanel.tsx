@@ -370,7 +370,7 @@ export function ChatPanel({
               className="rounded border-gray-300 dark:border-gray-600 text-indigo-600 focus:ring-indigo-500"
             />
             <span className="text-gray-500 dark:text-gray-400">Save to history</span>
-            <InfoTooltip text="When disabled, this conversation is not written to the database. Nothing is stored server-side — useful for sensitive research data or private experiments." />
+            <InfoTooltip text="When disabled, this conversation is not written to the database. Nothing is stored server-side — useful for sensitive research data or private experiments." align="right" />
           </label>
         </div>
       </div>
