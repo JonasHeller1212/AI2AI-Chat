@@ -1,6 +1,6 @@
 import React from 'react';
 import type { User } from '@supabase/supabase-js';
-import { Settings, SlidersHorizontal, ArrowLeft, UserCircle, Clock, Moon, Sun } from 'lucide-react';
+import { Settings, SlidersHorizontal, ArrowLeft, UserCircle, Clock, Moon, Sun, FlaskConical } from 'lucide-react';
 import { Logo } from './Logo';
 
 interface HeaderProps {
@@ -9,12 +9,13 @@ interface HeaderProps {
   onToggleSettings: () => void;
   onOpenUserSettings: () => void;
   onOpenHistory: () => void;
+  onOpenExperiments: () => void;
   user: User;
   isDarkMode: boolean;
   onToggleDarkMode: () => void;
 }
 
-export function Header({ onBack, onSignOut, onToggleSettings, onOpenUserSettings, onOpenHistory, user, isDarkMode, onToggleDarkMode }: HeaderProps) {
+export function Header({ onBack, onSignOut, onToggleSettings, onOpenUserSettings, onOpenHistory, onOpenExperiments, user, isDarkMode, onToggleDarkMode }: HeaderProps) {
   const displayName = user.user_metadata?.display_name || user.email?.split('@')[0] || 'Account';
 
   return (
@@ -31,6 +32,15 @@ export function Header({ onBack, onSignOut, onToggleSettings, onOpenUserSettings
           <Logo />
         </div>
         <div className="flex items-center gap-2">
+          <button
+            onClick={onOpenExperiments}
+            aria-label="Saved experiments"
+            className="flex items-center gap-1.5 px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+            title="Saved experiments"
+          >
+            <FlaskConical className="w-4 h-4" />
+            <span className="hidden sm:block">Experiments</span>
+          </button>
           <button
             onClick={onOpenHistory}
             aria-label="Conversation history"
