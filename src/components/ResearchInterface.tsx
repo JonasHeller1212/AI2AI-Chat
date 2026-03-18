@@ -10,7 +10,7 @@ import { X } from 'lucide-react';
 import { Header } from './Header';
 import { ErrorDisplay } from './ErrorDisplay';
 import { ChatPanel } from './ChatPanel';
-import { ScenarioCards, DEMO_SCENARIOS } from './ScenarioCards';
+import { ScenarioCards } from './ScenarioCards';
 import type { Scenario } from './ScenarioCards';
 import { AIConfigPanel } from './AIConfigPanel';
 import { UserSettings } from './UserSettings';
