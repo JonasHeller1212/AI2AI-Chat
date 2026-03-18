@@ -1,30 +1,44 @@
 import React from 'react';
+import { FlaskConical, Briefcase, GraduationCap } from 'lucide-react';
 
-interface FocusPoint {
+interface UseCaseColumn {
+  icon: React.ReactNode;
   title: string;
   points: string[];
   dotColor: string;
 }
 
-const focusAreas: FocusPoint[] = [
+const columns: UseCaseColumn[] = [
   {
-    title: "Questions worth asking",
+    icon: <FlaskConical className="h-5 w-5 text-orange-600" />,
+    title: "Research & academia",
     points: [
-      "Which model takes the conversational lead — and does it depend on the topic?",
-      "Does rephrasing a system prompt meaningfully change the outcome?",
-      "How do GPT-4 and Claude differ when reasoning through the same ethical dilemma?"
+      "Compare how models reason through ethical dilemmas or logical puzzles",
+      "Test whether rephrasing a system prompt meaningfully changes the outcome",
+      "Run the same setup N times for statistical comparison across models",
     ],
-    dotColor: "bg-orange-500"
+    dotColor: "bg-orange-500",
   },
   {
-    title: "Controls at your fingertips",
+    icon: <Briefcase className="h-5 w-5 text-sky-600" />,
+    title: "Business & strategy",
     points: [
-      "Independent system prompts, temperature, and max tokens per model",
-      "Auto-interact with configurable delays and turn limits",
-      "Repetition mode — run the same setup N times for statistical comparison"
+      "Simulate sales negotiations to find the most effective AI-driven pitch",
+      "Stress-test customer service scripts before deploying them",
+      "Brainstorm product ideas by letting two AI perspectives challenge each other",
     ],
-    dotColor: "bg-sky-500"
-  }
+    dotColor: "bg-sky-500",
+  },
+  {
+    icon: <GraduationCap className="h-5 w-5 text-indigo-600" />,
+    title: "Workshops & training",
+    points: [
+      "Run live demos in MBA or AI-literacy classes with pre-built scenarios",
+      "Let participants observe AI behaviour in negotiation, therapy, or debate",
+      "Share experiment configs via URL so the whole room starts from the same setup",
+    ],
+    dotColor: "bg-indigo-500",
+  },
 ];
 
 export function ResearchFocus() {
@@ -34,15 +48,18 @@ export function ResearchFocus() {
         <div className="text-center mb-6">
           <h2 className="text-3xl font-bold text-gray-900">What people use it for</h2>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {focusAreas.map((area) => (
-            <div key={area.title} className="bg-white p-6 rounded-xl shadow-md">
-              <h3 className="text-xl font-semibold mb-3">{area.title}</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {columns.map((col) => (
+            <div key={col.title} className="bg-white p-6 rounded-xl shadow-md">
+              <div className="flex items-center gap-2 mb-3">
+                {col.icon}
+                <h3 className="text-xl font-semibold">{col.title}</h3>
+              </div>
               <ul className="space-y-3">
-                {area.points.map((point) => (
+                {col.points.map((point) => (
                   <li key={point} className="flex items-start gap-3">
                     <div className="mt-1 flex-shrink-0">
-                      <div className={`w-2 h-2 ${area.dotColor} rounded-full`}></div>
+                      <div className={`w-2 h-2 ${col.dotColor} rounded-full`}></div>
                     </div>
                     <p className="text-gray-600">{point}</p>
                   </li>

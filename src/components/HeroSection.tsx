@@ -16,9 +16,9 @@ export function HeroSection({ onSignUpClick }: HeroSectionProps) {
             </span>
           </h1>
           <p className="text-xl text-gray-600 mb-6 max-w-2xl mx-auto">
-            Configure two AI models — GPT, Claude, Gemini, or Mistral — each with their own
-            system prompt and settings, then let them talk. Set turn counts, delays, and
-            repetitions. Export everything as CSV.
+            Put GPT, Claude, Gemini, or Mistral in conversation with each other.
+            Test negotiation strategies, brainstorm product ideas, simulate customer
+            interactions, or run controlled research experiments — then export everything as CSV.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6">
             <button
