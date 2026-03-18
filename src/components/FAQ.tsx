@@ -7,20 +7,28 @@ const faqs = [
     a: "A free tool that puts two AI models in conversation with each other. You configure each model independently — provider, version, system prompt, temperature — then watch them converse and export the results. No coding required.",
   },
   {
+    q: "Who is it for?",
+    a: "Researchers studying AI behaviour, business teams testing negotiation or sales strategies, educators running AI-literacy workshops, and anyone curious about how different models interact.",
+  },
+  {
     q: "Is it free?",
     a: "Yes. The platform is free. You bring your own API keys from OpenAI, Anthropic, Google, or Mistral and pay only those providers for the tokens you use.",
   },
   {
     q: "Which models are supported?",
-    a: "GPT-4o and variants (OpenAI), Claude 3 / 3.5 (Anthropic), Gemini 1.5 Pro and Flash (Google), and Mistral Large / Medium / Small.",
+    a: "GPT-4o and variants (OpenAI), Claude Opus 4.6, Sonnet 4.6, and Haiku 4.5 (Anthropic), Gemini 1.5 Pro and Flash (Google), and Mistral Large / Medium / Small.",
   },
   {
     q: "Are my API keys safe?",
     a: "Keys are stored only in your browser's local storage — they are never sent to our servers. They are automatically cleared when you sign out.",
   },
   {
-    q: "Is conversation data stored?",
-    a: "By default, conversations are saved to your account so you can review them in the history panel. You can disable this per session with the 'Save to history' toggle in the app.",
+    q: "Can I use it for a workshop or class?",
+    a: "Absolutely. Share a single API key with your group, pick a built-in scenario (or create your own), and share the config via URL so everyone starts from the same setup. We've tested it with 15+ concurrent users on a single key with zero issues.",
+  },
+  {
+    q: "What are the built-in scenarios?",
+    a: "The app ships with ready-to-go scenarios — a comedian roast battle, a B2B contract negotiation, and a CBT therapy session. Each one pre-fills both system prompts and conversation settings so you can start instantly.",
   },
   {
     q: "Can I export the data?",

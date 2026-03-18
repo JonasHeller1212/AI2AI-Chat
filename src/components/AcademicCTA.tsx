@@ -9,8 +9,8 @@ export function AcademicCTA({ onSignUpClick }: AcademicCTAProps) {
     <div className="py-10 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <h2 className="text-3xl font-bold text-gray-900 mb-3">Ready to try it?</h2>
-        <p className="text-gray-600 mb-6">
-          Free to use. Bring your own API keys from OpenAI, Anthropic, Google, or Mistral.
+        <p className="text-gray-600 mb-6 max-w-xl mx-auto">
+          Free for researchers, teams, and classrooms. Bring your own API keys from OpenAI, Anthropic, Google, or Mistral.
         </p>
         <button
           onClick={onSignUpClick}

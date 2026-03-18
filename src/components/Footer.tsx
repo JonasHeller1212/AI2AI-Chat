@@ -1,5 +1,5 @@
 import React from 'react';
-import { Bot, FlaskConical, Mail } from 'lucide-react';
+import { Bot, Mail } from 'lucide-react';
 
 interface FooterProps {
   onPrivacyClick: () => void;
@@ -15,14 +15,14 @@ export function Footer({ onPrivacyClick, onTermsClick }: FooterProps) {
           {/* Brand */}
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <div className="relative">
-                <FlaskConical className="h-6 w-6 text-orange-400" />
-                <Bot className="h-3 w-3 text-sky-400 absolute -bottom-0.5 -right-0.5" />
+              <div className="flex items-center">
+                <Bot className="h-5 w-5 text-orange-400" />
+                <Bot className="h-5 w-5 text-sky-400 -ml-1.5" />
               </div>
               <span className="text-white font-bold text-lg">AI2AI-Chat</span>
             </div>
             <p className="text-sm max-w-xs">
-              A free tool for studying AI-to-AI conversations. Bring your own API keys.
+              A free tool for AI-to-AI conversations — for research, business, and the classroom. Bring your own API keys.
             </p>
             <p className="text-xs text-gray-500">
               API keys are stored in your browser only and never reach our servers.
