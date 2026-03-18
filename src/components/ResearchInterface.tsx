@@ -500,7 +500,7 @@ export function ResearchInterface({
   const handleLoadScenario = (scenario: Scenario) => {
     setSystemPrompt1(scenario.botAPrompt);
     setSystemPrompt2(scenario.botBPrompt);
-    setOpeningMessage(scenario.sharedPrompt);
+    setUserInput(scenario.sharedPrompt);
     setStopKeywords(scenario.stopKeywords);
     setBotMode(scenario.botMode);
   };
