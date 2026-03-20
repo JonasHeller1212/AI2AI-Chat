@@ -150,7 +150,10 @@ export function ResearchInterface({
   // Check if user is a workshop organizer
   useEffect(() => {
     supabase.functions.invoke('workshop-config', { body: { action: 'check-organizer' } })
-      .then(({ data }) => { if (data?.isOrganizer) setIsOrganizer(true); })
+      .then((res) => {
+        const result = res.data;
+        if (result?.isOrganizer) setIsOrganizer(true);
+      })
       .catch(() => {});
   }, []);
 
