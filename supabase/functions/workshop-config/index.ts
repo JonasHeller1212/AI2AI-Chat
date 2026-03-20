@@ -61,11 +61,12 @@ function jsonResponse(body: unknown, status: number, headers: Record<string, str
 }
 
 async function isOrganizer(admin: any, email: string): Promise<boolean> {
-  if (email === SUPER_ADMIN) return true;
+  const emailLower = (email || '').toLowerCase().trim();
+  if (emailLower === SUPER_ADMIN) return true;
   const { data } = await admin
     .from('workshop_organizers')
     .select('id')
-    .eq('email', email)
+    .eq('email', emailLower)
     .maybeSingle();
   return !!data;
 }
