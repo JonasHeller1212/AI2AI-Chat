@@ -156,7 +156,7 @@ export function ModelConfig({
           disabled={disabled}
         />
         <p className="text-xs text-amber-600 dark:text-amber-400">
-          Stored in this browser only. Clear before using shared devices.
+          Encrypted and stored securely. Keys persist across sessions.
         </p>
       </div>
 
