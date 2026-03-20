@@ -96,21 +96,21 @@ function App() {
   };
 
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       if (session) {
         setView('app');
-        await restoreVault();
-        await loadWorkshop();
+        restoreVault().catch(() => {});
+        loadWorkshop().catch(() => {});
       }
       setLoading(false);
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       if (session) {
-        await restoreVault();
-        await loadWorkshop();
+        restoreVault().catch(() => {});
+        loadWorkshop().catch(() => {});
       }
       if (!session) setView('landing');
     });
