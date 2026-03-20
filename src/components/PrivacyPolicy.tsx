@@ -44,9 +44,10 @@ export function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
               <li><strong>Browser preferences:</strong> Theme preference (light/dark) and chat settings are stored in your browser's localStorage and never sent to our servers.</li>
             </ul>
             <p className="mt-2">
-              <strong>API keys are never collected.</strong> They are stored exclusively in your browser's
-              localStorage and transmitted directly from your browser to the respective AI provider
-              (OpenAI, Anthropic, Google, Mistral). We have no access to them.
+              <strong>API keys are encrypted and stored securely.</strong> When you save an API key, it is
+              encrypted with AES-256-GCM on our server and stored in our database. Keys are decrypted
+              only when you log in and are transmitted directly from your browser to the respective AI
+              provider (OpenAI, Anthropic, Google, Mistral). Keys are cleared from your browser on sign-out.
             </p>
           </section>
 
@@ -143,10 +144,10 @@ export function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">8. Browser Storage (localStorage)</h2>
             <p>
               This app uses your browser's <strong>localStorage</strong> (not cookies) to store your
-              theme preference and chat settings. localStorage data stays on your device and is never
-              transmitted to our servers. You can clear it at any time via your browser's developer
-              tools or by signing out (API keys are cleared automatically on sign-out). No third-party
-              tracking scripts or advertising cookies are used.
+              theme preference and chat settings. API keys are encrypted server-side (AES-256-GCM) and
+              stored in our database so they persist across sessions and devices. A temporary copy is
+              kept in localStorage during your session and cleared automatically on sign-out. No
+              third-party tracking scripts or advertising cookies are used.
             </p>
           </section>
 

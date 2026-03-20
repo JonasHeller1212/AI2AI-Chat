@@ -25,7 +25,7 @@ export function Footer({ onPrivacyClick, onTermsClick }: FooterProps) {
               A free tool for AI-to-AI conversations — for research, business, and the classroom. Bring your own API keys.
             </p>
             <p className="text-xs text-gray-500">
-              API keys are stored in your browser only and never reach our servers.
+              API keys are encrypted and stored securely. They persist across sessions and devices.
             </p>
           </div>
 
