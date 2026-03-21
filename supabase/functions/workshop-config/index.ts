@@ -60,6 +60,7 @@ function jsonResponse(body: unknown, status: number, headers: Record<string, str
   });
 }
 
+// deno-lint-ignore no-explicit-any
 async function isOrganizer(admin: any, email: string): Promise<boolean> {
   const emailLower = (email || '').toLowerCase().trim();
   if (emailLower === SUPER_ADMIN) return true;
@@ -387,9 +388,6 @@ Deno.serve(async (req) => {
       // User count via admin auth
       let totalUsers = 0;
       try {
-        const { data: { users: allUsers } } = await admin.auth.admin.listUsers({ perPage: 1, page: 1 });
-        // listUsers returns paginated, but we can get the total from a count query trick
-        // Actually, let's just iterate pages to count
         let page = 1;
         let count = 0;
         while (true) {
