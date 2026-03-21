@@ -1,6 +1,30 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { X, Plus, Copy, Check, ToggleLeft, ToggleRight, KeyRound, ExternalLink, AlertTriangle } from 'lucide-react';
 
+const PROVIDER_MODELS: Record<string, { id: string; name: string }[]> = {
+  gpt4: [
+    { id: 'gpt-4o-mini', name: 'GPT-4o Mini (recommended for workshops)' },
+    { id: 'gpt-4o', name: 'GPT-4o' },
+    { id: 'gpt-4-turbo', name: 'GPT-4 Turbo' },
+    { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo' },
+  ],
+  claude: [
+    { id: 'claude-haiku-4-5-20251001', name: 'Claude Haiku 4.5 (recommended for workshops)' },
+    { id: 'claude-sonnet-4-6', name: 'Claude Sonnet 4.6' },
+    { id: 'claude-3-5-haiku-20241022', name: 'Claude 3.5 Haiku' },
+    { id: 'claude-3-5-sonnet-20241022', name: 'Claude 3.5 Sonnet' },
+  ],
+  gemini: [
+    { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash (recommended for workshops)' },
+    { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro' },
+  ],
+  mistral: [
+    { id: 'mistral-small-latest', name: 'Mistral Small (recommended for workshops)' },
+    { id: 'mistral-medium-latest', name: 'Mistral Medium' },
+    { id: 'mistral-large-latest', name: 'Mistral Large' },
+  ],
+};
+
 const API_KEY_URLS: Record<string, { label: string; url: string }> = {
   gpt4: { label: 'OpenAI API Keys', url: 'https://platform.openai.com/api-keys' },
   claude: { label: 'Anthropic API Keys', url: 'https://console.anthropic.com/settings/keys' },
@@ -57,6 +81,7 @@ export function WorkshopAdmin({ onClose }: WorkshopAdminProps) {
   const [newWelcome, setNewWelcome] = useState('');
   const [newApiKey, setNewApiKey] = useState('');
   const [newProvider, setNewProvider] = useState('gpt4');
+  const [newModel, setNewModel] = useState('gpt-4o-mini');
   const [creating, setCreating] = useState(false);
   const [savedKeys, setSavedKeys] = useState<ProviderVault | null>(null);
 
@@ -100,9 +125,10 @@ export function WorkshopAdmin({ onClose }: WorkshopAdminProps) {
         welcome: newWelcome,
         apiKey: newApiKey,
         provider: newProvider,
+        config: { m1: newProvider, m2: newProvider, mv1: newModel, mv2: newModel },
       });
       setShowCreate(false);
-      setNewCode(''); setNewName(''); setNewWelcome(''); setNewApiKey('');
+      setNewCode(''); setNewName(''); setNewWelcome(''); setNewApiKey(''); setNewModel(PROVIDER_MODELS['gpt4'][0].id);
       await fetchWorkshops();
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to create workshop');
@@ -172,7 +198,7 @@ export function WorkshopAdmin({ onClose }: WorkshopAdminProps) {
                     onChange={e => {
                       const p = e.target.value;
                       setNewProvider(p);
-                      // Auto-fill API key if the user has a saved key for this provider
+                      setNewModel(PROVIDER_MODELS[p]?.[0]?.id || '');
                       if (savedKeys) {
                         const key = savedKeys[p as keyof ProviderVault];
                         if (key) setNewApiKey(key);
@@ -186,6 +212,18 @@ export function WorkshopAdmin({ onClose }: WorkshopAdminProps) {
                     <option value="mistral">Mistral</option>
                   </select>
                 </div>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Model</label>
+                <select
+                  value={newModel}
+                  onChange={e => setNewModel(e.target.value)}
+                  className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                >
+                  {(PROVIDER_MODELS[newProvider] || []).map(m => (
+                    <option key={m.id} value={m.id}>{m.name}</option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Workshop Name</label>
