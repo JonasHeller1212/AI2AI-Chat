@@ -45,6 +45,7 @@ function App() {
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signup');
   const [workshopData, setWorkshopData] = useState<WorkshopData | null>(null);
   const [workshopPublicInfo, setWorkshopPublicInfo] = useState<WorkshopPublicInfo | null>(null);
+  const [workshopInactive, setWorkshopInactive] = useState<string | null>(null);
   const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
     const stored = localStorage.getItem('ai2ai_theme');
     if (stored) return stored === 'dark';
@@ -107,7 +108,9 @@ function App() {
         body: JSON.stringify({ action: 'get-public', code: URL_PARAMS.workshop }),
       });
       const data = await resp.json();
-      if (resp.ok && data.name) {
+      if (resp.ok && data.inactive) {
+        setWorkshopInactive(data.name || 'This workshop');
+      } else if (resp.ok && data.name) {
         setWorkshopPublicInfo({ name: data.name, welcome: data.welcome || '' });
       }
     } catch { /* non-blocking */ }
@@ -201,8 +204,29 @@ function App() {
 
   const storageNotice = <StorageNotice onPrivacyClick={() => setView('privacy')} />;
 
-  // Workshop link: skip landing page, go straight to auth
+  // Workshop link: show inactive message or skip to auth
   if (view === 'landing' && URL_PARAMS.workshop && !session) {
+    if (workshopInactive) {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950 p-4">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg max-w-md w-full p-8 text-center">
+            <div className="w-12 h-12 bg-amber-100 dark:bg-amber-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-2xl">⏸</span>
+            </div>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{workshopInactive}</h2>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+              This workshop session has ended or is currently inactive. Please contact the workshop organizer for access or an updated link.
+            </p>
+            <button
+              onClick={() => { window.location.href = window.location.origin; }}
+              className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-orange-500 to-sky-500 rounded-lg hover:from-orange-400 hover:to-sky-400 transition-all"
+            >
+              Go to AI2AI Chat
+            </button>
+          </div>
+        </div>
+      );
+    }
     return <>{storageNotice}<Auth onAuthSuccess={() => setView('app')} initialIsSignUp={authMode === 'signup'} workshopInfo={workshopPublicInfo} /></>;
   }
 

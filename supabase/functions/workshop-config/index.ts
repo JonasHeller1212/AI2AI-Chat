@@ -103,13 +103,16 @@ Deno.serve(async (req) => {
 
       const { data, error } = await admin
         .from('workshops')
-        .select('name, welcome')
+        .select('name, welcome, active')
         .eq('code', code.toLowerCase().trim())
-        .eq('active', true)
         .maybeSingle();
 
       if (error || !data) {
         return jsonResponse({ error: 'Workshop not found' }, 404, corsHeaders);
+      }
+
+      if (!data.active) {
+        return jsonResponse({ inactive: true, name: data.name }, 200, corsHeaders);
       }
 
       return jsonResponse({ name: data.name, welcome: data.welcome }, 200, corsHeaders);
