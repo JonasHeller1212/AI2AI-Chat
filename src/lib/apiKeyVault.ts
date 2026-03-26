@@ -25,6 +25,7 @@ export function loadVault(): ProviderVault {
 // Save to localStorage cache and trigger debounced server sync
 export function saveVault(keys: ProviderVault): void {
   localStorage.setItem(VAULT_KEY, JSON.stringify(keys));
+  window.dispatchEvent(new StorageEvent('storage', { key: VAULT_KEY }));
   debouncedServerSave(keys);
 }
 
@@ -62,8 +63,9 @@ export async function loadVaultFromServer(): Promise<ProviderVault> {
     });
     if (error || !data?.keys) return { ...EMPTY };
     const serverKeys: ProviderVault = { ...EMPTY, ...data.keys };
-    // Populate localStorage cache
+    // Populate localStorage cache and notify listeners
     localStorage.setItem(VAULT_KEY, JSON.stringify(serverKeys));
+    window.dispatchEvent(new StorageEvent('storage', { key: VAULT_KEY }));
     return serverKeys;
   } catch {
     return { ...EMPTY };

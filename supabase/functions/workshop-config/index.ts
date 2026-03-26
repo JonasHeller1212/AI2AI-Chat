@@ -300,10 +300,11 @@ Deno.serve(async (req) => {
         return jsonResponse({ error: 'Missing workshop code' }, 400, corsHeaders);
       }
 
-      await admin.from('workshop_signups').insert({
-        user_id: user.id,
-        workshop_code: code.toLowerCase().trim(),
-      });
+      // Upsert to prevent duplicate signups per user per workshop
+      await admin.from('workshop_signups').upsert(
+        { user_id: user.id, workshop_code: code.toLowerCase().trim() },
+        { onConflict: 'user_id,workshop_code', ignoreDuplicates: true }
+      );
 
       return jsonResponse({ success: true }, 200, corsHeaders);
     }
@@ -368,21 +369,17 @@ Deno.serve(async (req) => {
 
       const { period } = body as { period?: string };
 
-      // Build date filter
+      // Build date filter (use UTC explicitly to avoid timezone drift)
       let dateFilter: string | null = null;
+      const now = new Date();
       if (period === 'day') {
-        const d = new Date();
-        d.setHours(0, 0, 0, 0);
+        const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
         dateFilter = d.toISOString();
       } else if (period === 'week') {
-        const d = new Date();
-        d.setDate(d.getDate() - 6);
-        d.setHours(0, 0, 0, 0);
+        const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - 6));
         dateFilter = d.toISOString();
       } else if (period === 'month') {
-        const d = new Date();
-        d.setDate(d.getDate() - 29);
-        d.setHours(0, 0, 0, 0);
+        const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - 29));
         dateFilter = d.toISOString();
       }
       // 'all' or undefined => no date filter
@@ -439,19 +436,28 @@ Deno.serve(async (req) => {
       if (dateFilter) signupQuery = signupQuery.gte('created_at', dateFilter);
       const { data: signups } = await signupQuery.order('created_at', { ascending: false });
 
-      const totalSignups = signups?.length || 0;
+      // Deduplicate signups by user_id + workshop_code
+      const uniqueSignupKeys = new Set<string>();
+      const uniqueSignups = (signups || []).filter((s: { user_id: string; workshop_code: string }) => {
+        const key = `${s.user_id}:${s.workshop_code}`;
+        if (uniqueSignupKeys.has(key)) return false;
+        uniqueSignupKeys.add(key);
+        return true;
+      });
+
+      const totalSignups = uniqueSignups.length;
 
       // Group by workshop
       const workshopMap: Record<string, number> = {};
-      (signups || []).forEach((s: { workshop_code: string }) => {
+      uniqueSignups.forEach((s: { workshop_code: string }) => {
         workshopMap[s.workshop_code] = (workshopMap[s.workshop_code] || 0) + 1;
       });
       const signupsByWorkshop = Object.entries(workshopMap)
         .sort(([, a], [, b]) => b - a)
         .map(([workshop_code, count]) => ({ workshop_code, count }));
 
-      // Recent sign-ups (last 20)
-      const recentSignups = (signups || []).slice(0, 20).map((s: { user_id: string; workshop_code: string; created_at: string }) => ({
+      // Recent sign-ups (last 20, deduplicated)
+      const recentSignups = uniqueSignups.slice(0, 20).map((s: { user_id: string; workshop_code: string; created_at: string }) => ({
         user_id: s.user_id,
         workshop_code: s.workshop_code,
         created_at: s.created_at,

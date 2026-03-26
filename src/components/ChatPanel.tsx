@@ -36,6 +36,8 @@ interface ChatPanelProps {
   bubbleColor2: string;
   textColor1: string;
   textColor2: string;
+  chatMode: boolean;
+  onChatModeChange: (v: boolean) => void;
   // Research features (SPEC-02/03/04/06)
   sessionId?: string;
   conditionLabel?: string;
@@ -93,6 +95,8 @@ export function ChatPanel({
   onOpeningMessageChange,
   stopKeywords,
   onStopKeywordsChange,
+  chatMode,
+  onChatModeChange,
   onShareConfig,
   shareCopied,
   onSaveExperiment,
@@ -348,7 +352,7 @@ export function ChatPanel({
       )}
 
       {/* Input area */}
-      <div className="p-4 border-t dark:border-gray-700 space-y-3">
+      <div className="p-3 border-t dark:border-gray-700 space-y-2">
 
         {/* Scenario prompt — hidden in asymmetric mode when an opening message is configured */}
         {!(botMode === 'asymmetric' && openingMessage.trim()) && (
@@ -356,10 +360,11 @@ export function ChatPanel({
             <div className="flex items-center gap-1.5">
               <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Scenario Prompt</span>
               <InfoTooltip text="Set the stage for the AI conversation. Describe a scenario, pose a question, or provide context that both bots will use as their starting point. Leave blank to let the system prompts guide the conversation from the start." />
+              <span className="text-[10px] text-gray-400 dark:text-gray-500 ml-1">Tip: avoid describing both bots here — configure each bot's role in their individual prompt fields.</span>
             </div>
             <div className="flex gap-3">
-            <input
-              type="text"
+            <textarea
+              rows={4}
               value={userInput}
               onChange={(e) => onUserInputChange(e.target.value)}
               onKeyDown={(e) => {
@@ -374,7 +379,7 @@ export function ChatPanel({
                   ? 'Scenario prompt (optional — sets the scene for both bots before they start)'
                   : 'Scenario prompt (optional — sets the scene for the conversation, e.g. a question or topic)'
               }
-              className="flex-1 p-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm disabled:opacity-50 disabled:cursor-not-allowed bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
+              className="flex-1 p-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm disabled:opacity-50 disabled:cursor-not-allowed bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 resize-y min-h-[100px]"
             />
             {isLoading && onStop ? (
               <button
@@ -453,14 +458,14 @@ export function ChatPanel({
                 <span className="text-gray-500 dark:text-gray-400">Messages per bot</span>
                 <input
                   type="number"
-                  min="1"
+                  min="2"
                   max="25"
                   step="1"
                   value={Math.ceil(maxInteractions / 2)}
-                  onChange={(e) => onMaxInteractionsChange(Math.max(1, Number(e.target.value)) * 2)}
+                  onChange={(e) => onMaxInteractionsChange(Math.max(2, Number(e.target.value)) * 2)}
                   className="w-14 px-2 py-1 border border-gray-300 dark:border-gray-600 rounded text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 />
-                <InfoTooltip text="How many times each bot responds per run. Set to 5 → Bot A speaks 5 times, Bot B speaks 5 times (10 total AI responses)." />
+                <InfoTooltip text="How many times each bot responds per run (min 2). Set to 5 → Bot A speaks 5 times, Bot B speaks 5 times (10 total AI responses)." />
               </label>
 
               <label className="flex items-center gap-2">
@@ -468,9 +473,9 @@ export function ChatPanel({
                 <input
                   type="range"
                   min="0"
-                  max="30"
+                  max="3"
                   step="0.5"
-                  value={responseDelay}
+                  value={Math.min(responseDelay, 3)}
                   onChange={(e) => onResponseDelayChange(Number(e.target.value))}
                   className="w-24 accent-indigo-600"
                 />
@@ -505,6 +510,17 @@ export function ChatPanel({
               </label>
             </>
           )}
+
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={chatMode}
+              onChange={(e) => onChatModeChange(e.target.checked)}
+              className="rounded border-gray-300 dark:border-gray-600 text-indigo-600 focus:ring-indigo-500"
+            />
+            <span className="text-gray-500 dark:text-gray-400">Chat mode</span>
+            <InfoTooltip text="When enabled, appends an instruction to both bots asking them to reply in short, conversational sentences (1–2 sentences max). Your own prompts are always preserved." />
+          </label>
 
           <label className="flex items-center gap-2 cursor-pointer ml-auto">
             <input
