@@ -119,13 +119,13 @@ export function ModelConfig({
   };
 
   return (
-    <div className={`space-y-4 ${disabled ? 'opacity-50' : ''}`}>
+    <div className={`space-y-3 ${disabled ? 'opacity-50' : ''}`}>
       <div className="space-y-2">
         <label className="text-sm font-medium text-gray-700 dark:text-gray-200">AI Provider</label>
         <select
           value={model}
           onChange={(e) => handleProviderChange(e.target.value as AIModel)}
-          className="w-full p-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-sm text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+          className="w-full p-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-sm text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
           disabled={disabled}
         >
           {(Object.keys(PROVIDER_LABELS) as AIModel[]).map((m) => (
@@ -151,7 +151,7 @@ export function ModelConfig({
           type="password"
           value={apiKey}
           onChange={(e) => onApiKeyChange(e.target.value)}
-          className="w-full p-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-sm text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+          className="w-full p-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-sm text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
           placeholder={API_KEY_PLACEHOLDERS[model]}
           disabled={disabled}
         />
@@ -160,19 +160,7 @@ export function ModelConfig({
         </p>
       </div>
 
-      {model === 'gpt4' && (
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700 dark:text-gray-200">Organization ID <span className="text-gray-400 dark:text-gray-500">(optional)</span></label>
-          <input
-            type="text"
-            value={orgId}
-            onChange={(e) => onOrgIdChange(e.target.value)}
-            className="w-full p-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-sm text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-            placeholder="org-..."
-            disabled={disabled}
-          />
-        </div>
-      )}
+      {/* Organization ID removed — it causes silent failures with direct browser API calls */}
 
       <div className="space-y-2">
         <label className="text-sm font-medium text-gray-700 dark:text-gray-200">Model</label>
@@ -183,7 +171,7 @@ export function ModelConfig({
             const v = versions.find(v => v.id === e.target.value);
             if (v) onMaxTokensChange(Math.min(maxTokens, v.maxTokens));
           }}
-          className="w-full p-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-sm text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+          className="w-full p-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-sm text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
           disabled={disabled}
         >
           {versions.map((v) => (
@@ -228,7 +216,7 @@ export function ModelConfig({
             const v = Number(e.target.value);
             onMaxTokensChange(Math.max(1, Math.min(v, currentMax)));
           }}
-          className="w-full p-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-sm text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+          className="w-full p-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-sm text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
           disabled={disabled}
         />
       </div>

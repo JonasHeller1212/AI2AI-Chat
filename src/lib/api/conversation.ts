@@ -13,7 +13,8 @@ const MAX_RETRY_AFTER_MS = 60_000;
 
 export async function generateResponse(
   config: ChatConfig,
-  messages: Message[]
+  messages: Message[],
+  signal?: AbortSignal
 ): Promise<Message> {
   const startTime = Date.now();
   const provider = createProvider(config.model);
@@ -43,7 +44,7 @@ export async function generateResponse(
         model: config.modelVersion,
         temperature: config.temperature,
         maxTokens: config.maxTokens
-      }, apiMessages);
+      }, apiMessages, signal);
 
       const timeTaken = Date.now() - startTime;
       const wordCount = result.content.trim().split(/\s+/).filter(Boolean).length;

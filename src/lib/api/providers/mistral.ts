@@ -3,9 +3,12 @@ import { APIProvider, APIConfig, APIResponse, APIError } from '../types';
 const REQUEST_TIMEOUT_MS = 30_000;
 
 export class MistralProvider implements APIProvider {
-  async makeRequest(config: APIConfig, messages: Array<{role: string; content: string}>): Promise<APIResponse> {
+  async makeRequest(config: APIConfig, messages: Array<{role: string; content: string}>, signal?: AbortSignal): Promise<APIResponse> {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+    if (signal) {
+      signal.addEventListener('abort', () => controller.abort(), { once: true });
+    }
 
     let response: Response;
     try {

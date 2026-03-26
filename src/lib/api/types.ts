@@ -26,7 +26,7 @@ export interface APIConfig {
 }
 
 export interface APIProvider {
-  makeRequest: (config: APIConfig, messages: Array<{role: string; content: string}>) => Promise<APIResponse>;
+  makeRequest: (config: APIConfig, messages: Array<{role: string; content: string}>, signal?: AbortSignal) => Promise<APIResponse>;
 }
 
 /** Error thrown by providers when the HTTP response is not OK. */

@@ -126,7 +126,7 @@ export function AIConfigPanel({
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
+    <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm text-sm">
       <div className="flex items-center gap-2 mb-4">
         <Bot className="w-5 h-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0" />
         <div className="flex flex-col w-full">
@@ -161,7 +161,7 @@ export function AIConfigPanel({
       <div className="mt-4">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-1.5">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-200">System Prompt</label>
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-200">{botSlot === 1 ? 'Bot A' : 'Bot B'} Prompt</label>
             <InfoTooltip text="Instructions given to this AI at the start of every conversation. Use it to define the bot's persona, expertise, communication style, and any rules it should follow." />
           </div>
           <div className="flex items-center gap-2 text-xs">

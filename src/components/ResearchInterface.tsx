@@ -96,15 +96,18 @@ export function ResearchInterface({
   const [model1, setModel1] = useState<AIModel>((sc(sharedConfig, 'm1') as AIModel) ?? saved?.model1 ?? 'gpt4');
   const [model2, setModel2] = useState<AIModel>((sc(sharedConfig, 'm2') as AIModel) ?? saved?.model2 ?? 'gpt4');
   const [apiKey1, setApiKey1] = useState<string>(() => {
-    if (saved?.apiKey1) return saved.apiKey1;
-    return loadVault()[saved?.model1 ?? 'gpt4'] ?? '';
+    const vault = loadVault();
+    const provider = (sc(sharedConfig, 'm1') as AIModel) ?? saved?.model1 ?? 'gpt4';
+    return vault[provider] || saved?.apiKey1 || '';
   });
   const [apiKey2, setApiKey2] = useState<string>(() => {
-    if (saved?.apiKey2) return saved.apiKey2;
-    return loadVault()[saved?.model2 ?? 'gpt4'] ?? '';
+    const vault = loadVault();
+    const provider = (sc(sharedConfig, 'm2') as AIModel) ?? saved?.model2 ?? 'gpt4';
+    return vault[provider] || saved?.apiKey2 || '';
   });
-  const [orgId1, setOrgId1] = useState<string>(saved?.orgId1 ?? '');
-  const [orgId2, setOrgId2] = useState<string>(saved?.orgId2 ?? '');
+  // Organization ID removed — causes silent failures with direct browser API calls
+  const [orgId1, setOrgId1] = useState<string>('');
+  const [orgId2, setOrgId2] = useState<string>('');
   const [modelVersion1, setModelVersion1] = useState<string>(sc(sharedConfig, 'mv1') ?? saved?.modelVersion1 ?? 'gpt-4o');
   const [modelVersion2, setModelVersion2] = useState<string>(sc(sharedConfig, 'mv2') ?? saved?.modelVersion2 ?? 'gpt-4o');
   const [temperature1, setTemperature1] = useState<number>(scNum(sharedConfig, 't1') ?? saved?.temperature1 ?? 0.7);
@@ -121,7 +124,7 @@ export function ResearchInterface({
   );
   const [responseDelay, setResponseDelay] = useState<number>(scNum(sharedConfig, 'rd') ?? saved?.responseDelay ?? 1);
   const [delayVariance, setDelayVariance] = useState<boolean>(scBool(sharedConfig, 'dv') ?? saved?.delayVariance ?? false);
-  const [maxInteractions, setMaxInteractions] = useState<number>(scNum(sharedConfig, 'mi') ?? saved?.maxInteractions ?? 10);
+  const [maxInteractions, setMaxInteractions] = useState<number>(Math.max(4, scNum(sharedConfig, 'mi') ?? saved?.maxInteractions ?? 10));
   const [repetitionCount, setRepetitionCount] = useState<number>(scNum(sharedConfig, 'rc') ?? saved?.repetitionCount ?? 1);
   const [bubbleColor1, setBubbleColor1] = useState<string>(sc(sharedConfig, 'bc1') ?? saved?.bubbleColor1 ?? '#EEF2FF');
   const [bubbleColor2, setBubbleColor2] = useState<string>(sc(sharedConfig, 'bc2') ?? saved?.bubbleColor2 ?? '#ECFDF5');
@@ -136,6 +139,8 @@ export function ResearchInterface({
 
   // SPEC-04: keyword stopping
   const [stopKeywords, setStopKeywords] = useState<string>(sc(sharedConfig, 'sk') ?? saved?.stopKeywords ?? '');
+
+  const [chatMode, setChatMode] = useState<boolean>(saved?.chatMode ?? true);
 
   const [userInput, setUserInput] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
@@ -230,6 +235,30 @@ export function ResearchInterface({
   } | null>(null);
   const pendingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isStoppedRef = useRef(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  // Re-sync API keys from vault when localStorage changes (e.g. after auth restores vault from server)
+  useEffect(() => {
+    const syncKeysFromVault = () => {
+      const vault = loadVault();
+      if (vault[model1] && vault[model1] !== apiKey1) setApiKey1(vault[model1]);
+      if (vault[model2] && vault[model2] !== apiKey2) setApiKey2(vault[model2]);
+    };
+
+    // Listen for storage events (cross-tab) and also poll once after a short delay
+    // to catch async vault restoration after auth
+    window.addEventListener('storage', syncKeysFromVault);
+    const timer = setTimeout(syncKeysFromVault, 1500);
+    // Also listen for visibility change (window switch)
+    const handleVisibility = () => { if (document.visibilityState === 'visible') syncKeysFromVault(); };
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    return () => {
+      window.removeEventListener('storage', syncKeysFromVault);
+      document.removeEventListener('visibilitychange', handleVisibility);
+      clearTimeout(timer);
+    };
+  }, [model1, model2]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => { autoInteractRef.current = autoInteract; }, [autoInteract]);
   useEffect(() => { maxInteractionsRef.current = maxInteractions; }, [maxInteractions]);
@@ -253,7 +282,7 @@ export function ResearchInterface({
       systemPrompt1, systemPrompt2, responseDelay, delayVariance,
       autoInteract, maxInteractions, repetitionCount, saveHistory,
       bubbleColor1, bubbleColor2, textColor1, textColor2,
-      botMode, openingMessage, stopKeywords,
+      botMode, openingMessage, stopKeywords, chatMode,
     }));
   }, [model1, model2, apiKey1, apiKey2, orgId1, orgId2,
       modelVersion1, modelVersion2, temperature1, temperature2,
@@ -261,7 +290,7 @@ export function ResearchInterface({
       systemPrompt1, systemPrompt2, responseDelay, delayVariance,
       autoInteract, maxInteractions, repetitionCount, saveHistory,
       bubbleColor1, bubbleColor2, textColor1, textColor2,
-      botMode, openingMessage, stopKeywords]);
+      botMode, openingMessage, stopKeywords, chatMode]);
 
   const validateConfigs = () => {
     const e1 = validateModelConfig(model1, { apiKey: apiKey1, temperature: temperature1, maxTokens: maxTokens1 });
@@ -269,6 +298,24 @@ export function ResearchInterface({
     const all = [...e1, ...e2];
     setErrors(all);
     return all.length === 0;
+  };
+
+  // Build effective system prompt: user prompt + chat mode instruction + role enforcement
+  const CHAT_MODE_INSTRUCTION = 'Reply in short, conversational sentences. Max 1–2 sentences per message. Write like a chat, not an essay.';
+
+  const buildEffectivePrompt = (basePrompt: string, botSlot: 1 | 2): string => {
+    let prompt = basePrompt;
+
+    if (chatMode) {
+      prompt += '\n\n' + CHAT_MODE_INSTRUCTION;
+    }
+
+    // Role bleed prevention: enforce single-role behavior
+    const myName = botSlot === 1 ? (botName1 || 'Bot A') : (botName2 || 'Bot B');
+    const otherName = botSlot === 1 ? (botName2 || 'Bot B') : (botName1 || 'Bot A');
+    prompt += `\n\nYou are only ${myName}. Never speak as, simulate, or continue the turn of ${otherName}. Wait for ${otherName}'s response. Stay in your role only.`;
+
+    return prompt;
   };
 
   const saveMessageToDb = (conversationId: string, msg: Message, role: string, modelLabel: string) => {
@@ -326,7 +373,24 @@ export function ResearchInterface({
         return { ...m, role: (m.botIndex === myBotIndex ? 'assistant' : 'user') as const };
       });
 
-      const response = await generateResponse(config, remappedMessages);
+      // Check if stopped before making the API call
+      if (isStoppedRef.current) {
+        setIsLoading(false);
+        return;
+      }
+
+      // Create abort controller for this request
+      const ac = new AbortController();
+      abortControllerRef.current = ac;
+
+      const response = await generateResponse(config, remappedMessages, ac.signal);
+      abortControllerRef.current = null;
+
+      // Check again after response in case stop was pressed during the request
+      if (isStoppedRef.current) {
+        setIsLoading(false);
+        return;
+      }
       const taggedResponse: Message = {
         ...response,
         botIndex: myBotIndex,
@@ -362,11 +426,11 @@ export function ResearchInterface({
         const otherConfig: ChatConfig = isFirstAI ? {
           model: model2, apiKey: apiKey2, orgId: orgId2,
           modelVersion: modelVersion2, temperature: temperature2,
-          maxTokens: maxTokens2, systemPrompt: systemPrompt2
+          maxTokens: maxTokens2, systemPrompt: buildEffectivePrompt(systemPrompt2, 2)
         } : {
           model: model1, apiKey: apiKey1, orgId: orgId1,
           modelVersion: modelVersion1, temperature: temperature1,
-          maxTokens: maxTokens1, systemPrompt: systemPrompt1
+          maxTokens: maxTokens1, systemPrompt: buildEffectivePrompt(systemPrompt1, 1)
         };
 
         const prevWords = taggedResponse.wordCount ?? 0;
@@ -425,12 +489,12 @@ export function ResearchInterface({
     const config1: ChatConfig = {
       model: model1, apiKey: apiKey1, orgId: orgId1,
       modelVersion: modelVersion1, temperature: temperature1,
-      maxTokens: maxTokens1, systemPrompt: systemPrompt1
+      maxTokens: maxTokens1, systemPrompt: buildEffectivePrompt(systemPrompt1, 1)
     };
     const config2: ChatConfig = {
       model: model2, apiKey: apiKey2, orgId: orgId2,
       modelVersion: modelVersion2, temperature: temperature2,
-      maxTokens: maxTokens2, systemPrompt: systemPrompt2
+      maxTokens: maxTokens2, systemPrompt: buildEffectivePrompt(systemPrompt2, 2)
     };
 
     const onChainComplete = (_trigger: string) => {
@@ -477,7 +541,6 @@ export function ResearchInterface({
     }
 
     isStoppedRef.current = false;
-    setUserInput('');
     setIsLoading(true);
     setInteractionCount(0);
     setRepetitionCurrent(0);
@@ -521,8 +584,8 @@ export function ResearchInterface({
       setMessages(prev => [...prev, opener]);
 
       const allMessages: Message[] = [
-        { id: 'sys1', role: 'system', content: systemPrompt1, timestamp: Date.now() },
-        { id: 'sys2', role: 'system', content: systemPrompt2, timestamp: Date.now() },
+        { id: 'sys1', role: 'system', content: buildEffectivePrompt(systemPrompt1, 1), timestamp: Date.now() },
+        { id: 'sys2', role: 'system', content: buildEffectivePrompt(systemPrompt2, 2), timestamp: Date.now() },
         ...messages,
         opener,
       ];
@@ -548,7 +611,7 @@ export function ResearchInterface({
     setMessages(prev => [...prev, newUserMessage]);
 
     const allMessages: Message[] = [
-      { id: 'sys1', role: 'system', content: systemPrompt1, timestamp: Date.now() },
+      { id: 'sys1', role: 'system', content: buildEffectivePrompt(systemPrompt1, 1), timestamp: Date.now() },
       ...messages,
       newUserMessage
     ];
@@ -569,6 +632,12 @@ export function ResearchInterface({
       clearTimeout(pendingTimeoutRef.current);
       pendingTimeoutRef.current = null;
     }
+    // Abort any in-flight API request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+    setIsLoading(false);
   };
 
   const handleLoadScenario = (scenario: Scenario) => {
@@ -580,11 +649,17 @@ export function ResearchInterface({
   };
 
   const handleResetChat = () => {
-    isStoppedRef.current = false;
+    // Stop any in-flight requests
+    isStoppedRef.current = true;
     if (pendingTimeoutRef.current) {
       clearTimeout(pendingTimeoutRef.current);
       pendingTimeoutRef.current = null;
     }
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+    // Clear conversation state only — never touch prompts, bot names, or config
     setMessages([]);
     setInteractionCount(0);
     setRepetitionCurrent(0);
@@ -593,6 +668,8 @@ export function ResearchInterface({
     setErrors([]);
     setStoppingTriggers({});
     initialChainRef.current = null;
+    // Allow next conversation to start
+    isStoppedRef.current = false;
   };
 
   // SPEC-01: load a saved experiment — applies all config values
@@ -977,10 +1054,10 @@ export function ResearchInterface({
         </div>
       )}
 
-      <main className="flex-1 min-h-0 w-full px-4 sm:px-6 lg:px-8 py-6 overflow-hidden">
-        <div className="flex gap-4 h-full min-h-0">
+      <main className="flex-1 min-h-0 w-full px-2 sm:px-4 lg:px-6 py-3 overflow-hidden">
+        <div className="flex gap-3 h-full min-h-0">
           {showSettings && (
-            <div data-tour="bot1-panel" className="hidden lg:flex lg:flex-col w-88 flex-shrink-0 overflow-y-auto" style={{ width: '22rem' }}>
+            <div data-tour="bot1-panel" className="hidden lg:flex lg:flex-col flex-shrink-0 overflow-y-auto" style={{ width: '19rem' }}>
               <AIConfigPanel
                 title={botName1}
                 onTitleChange={setBotName1}
@@ -1002,11 +1079,13 @@ export function ResearchInterface({
                 onBubbleColorChange={setBubbleColor1}
                 textColor={textColor1}
                 onTextColorChange={setTextColor1}
+                userId={user.id}
+                botSlot={1}
               />
             </div>
           )}
 
-          <div className="flex-1 flex flex-col gap-3 min-w-0 min-h-0">
+          <div className="flex-1 flex flex-col gap-2 min-w-0 min-h-0 overflow-hidden">
             <ErrorDisplay errors={errors} onClear={() => setErrors([])} />
             <ChatPanel
               messages={messages}
@@ -1030,6 +1109,8 @@ export function ResearchInterface({
               onExportCsv={messages.filter(m => !m.hidden && m.role !== 'system').length > 0 ? handleExportCsv : undefined}
               onResetChat={messages.length > 0 ? handleResetChat : undefined}
               onStop={isLoading ? handleStop : undefined}
+              chatMode={chatMode}
+              onChatModeChange={setChatMode}
               saveHistory={saveHistory}
               onSaveHistoryChange={setSaveHistory}
               botName1={botName1}
@@ -1059,7 +1140,7 @@ export function ResearchInterface({
           </div>
 
           {showSettings && (
-            <div data-tour="bot2-panel" className="hidden lg:flex lg:flex-col flex-shrink-0 overflow-y-auto" style={{ width: '22rem' }}>
+            <div data-tour="bot2-panel" className="hidden lg:flex lg:flex-col flex-shrink-0 overflow-y-auto" style={{ width: '19rem' }}>
               <AIConfigPanel
                 title={botName2}
                 onTitleChange={setBotName2}
@@ -1081,6 +1162,8 @@ export function ResearchInterface({
                 onBubbleColorChange={setBubbleColor2}
                 textColor={textColor2}
                 onTextColorChange={setTextColor2}
+                userId={user.id}
+                botSlot={2}
               />
             </div>
           )}

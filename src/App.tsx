@@ -147,12 +147,15 @@ function App() {
       setLoading(false);
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
       if (session) {
         restoreVault().catch(() => {});
         loadWorkshop().catch(() => {});
-        trackWorkshopSignup(session.access_token).catch(() => {});
+        // Only track signup on actual sign-in, not token refresh
+        if (event === 'SIGNED_IN') {
+          trackWorkshopSignup(session.access_token).catch(() => {});
+        }
       }
       if (!session) setView('landing');
     });
