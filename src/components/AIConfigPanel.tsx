@@ -223,7 +223,7 @@ export function AIConfigPanel({
         <textarea
           value={systemPrompt}
           onChange={(e) => onSystemPromptChange(e.target.value)}
-          className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md min-h-[100px] text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
+          className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md min-h-[160px] text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 resize-y"
           placeholder="Enter system prompt…"
         />
       </div>

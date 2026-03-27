@@ -55,7 +55,7 @@ export function SetupPage(props: SetupPageProps) {
 
   return (
     <div className="flex-1 overflow-y-auto">
-      <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
+      <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
 
         {/* Bot configuration panels */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -125,7 +125,7 @@ export function SetupPage(props: SetupPageProps) {
             value={props.userInput}
             onChange={(e) => props.onUserInputChange(e.target.value)}
             placeholder="Describe a scenario, pose a question, or leave blank to let the system prompts guide the conversation..."
-            className="w-full p-2.5 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 resize-y min-h-[80px] focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            className="w-full p-2.5 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 resize-y min-h-[120px] focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
           />
         </div>
 

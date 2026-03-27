@@ -1,6 +1,6 @@
 import React from 'react';
 import type { User } from '@supabase/supabase-js';
-import { Settings, SlidersHorizontal, ArrowLeft, UserCircle, Clock, Moon, Sun, FlaskConical, GraduationCap, BarChart3 } from 'lucide-react';
+import { Settings, SlidersHorizontal, ArrowLeft, UserCircle, Clock, Moon, Sun, FlaskConical, GraduationCap, BarChart3, Home } from 'lucide-react';
 import { Logo } from './Logo';
 
 export type AppView = 'dashboard' | 'setup' | 'chat';
@@ -8,6 +8,7 @@ export type AppView = 'dashboard' | 'setup' | 'chat';
 interface HeaderProps {
   currentView: AppView;
   onNavigateBack: () => void;
+  onNavigateHome: () => void;
   onSignOut: () => Promise<void>;
   onOpenUserSettings: () => void;
   onOpenHistory: () => void;
@@ -21,7 +22,7 @@ interface HeaderProps {
 }
 
 export function Header({
-  currentView, onNavigateBack, onSignOut,
+  currentView, onNavigateBack, onNavigateHome, onSignOut,
   onOpenUserSettings, onOpenHistory, onOpenExperiments,
   onOpenWorkshops, onOpenAdmin, isOrganizer,
   user, isDarkMode, onToggleDarkMode,
@@ -48,9 +49,20 @@ export function Header({
           )}
           <Logo />
           {currentView !== 'dashboard' && (
-            <span className="text-xs text-gray-400 dark:text-gray-500 hidden sm:block">
-              {currentView === 'setup' ? 'Configure' : 'Conversation'}
-            </span>
+            <>
+              <button
+                onClick={onNavigateHome}
+                aria-label="Back to dashboard"
+                title="Back to dashboard"
+                className="flex items-center gap-1 px-2.5 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+              >
+                <Home className="w-3.5 h-3.5" />
+                <span className="hidden sm:block">Dashboard</span>
+              </button>
+              <span className="text-xs text-gray-400 dark:text-gray-500 hidden sm:block">
+                {currentView === 'setup' ? 'Configure' : 'Conversation'}
+              </span>
+            </>
           )}
         </div>
         <div className="flex items-center gap-1.5">
