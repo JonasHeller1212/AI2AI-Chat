@@ -42,53 +42,41 @@ const STEPS: TourStep[] = [
   {
     target: null,
     title: 'Welcome to AI2AI Chat',
-    description: "You're about to run conversations between two AI models. This quick tour walks you through the app — takes less than a minute.",
+    description: "You're about to run conversations between two AI models. This quick tour walks you through the setup — takes less than a minute.",
   },
   {
     target: '[data-tour="bot1-panel"]',
     title: 'Configure Bot 1',
-    description: "Choose a provider (OpenAI, Claude, Gemini, or Mistral), paste your API key, pick a model version, and write a system prompt to define this bot's personality or role. On mobile, tap the Settings icon in the header to open the config panels.",
+    description: "Choose a provider (OpenAI, Claude, Gemini, or Mistral), pick a model version, and write a system prompt to define this bot's personality or role.",
     side: 'right',
   },
   {
     target: '[data-tour="bot2-panel"]',
     title: 'Configure Bot 2',
-    description: 'Set up the second bot as the other side of the debate or discussion. For the most interesting conversations, give it a contrasting system prompt. Both bots are configured in the same Settings panel on mobile.',
+    description: 'Set up the second bot the same way. For the most interesting conversations, give it a contrasting system prompt.',
     side: 'left',
   },
   {
     target: '[data-tour="chat-input"]',
-    title: 'Start the Conversation',
-    description: 'Type an opening topic or question and press Send. You can also leave it blank — the bots will start talking based on their system prompts alone.',
-    side: 'top',
-  },
-  {
-    target: '[data-tour="chat-controls"]',
-    title: 'Control the Flow',
-    description: 'Toggle auto-interact to let the bots reply to each other automatically. Set how many messages each bot sends, add a delay between responses, and repeat the same conversation multiple times to collect varied outputs for research.',
+    title: 'Scenario Prompt',
+    description: 'Describe the scenario or question both bots will discuss. You can also leave it blank — the bots will start talking based on their system prompts alone. Hit "Start Conversation" when ready.',
     side: 'top',
   },
   {
     target: '[data-tour="experiments-btn"]',
     title: 'Experiments',
-    description: 'Save your current bot setup — models, prompts, temperature, roles, and more — as a named experiment. Load it any time to run reproducible sessions. Perfect for comparing conditions across participants or across runs.',
+    description: 'Save your current bot setup — models, prompts, temperature, roles, and more — as a named experiment. Load it any time to run reproducible sessions.',
     side: 'bottom',
   },
   {
     target: null,
-    title: 'Research-Grade Features',
-    description: "Each bot supports an asymmetric role and a custom opening message for structured dialogue. Set stop keywords to auto-end a conversation at a predefined point. In the Data tab, export a .csv with per-message timing, word counts, and model metadata for offline analysis.",
-  },
-  {
-    target: '[data-tour="chat-tabs"]',
-    title: 'Chat View & Data View',
-    description: 'Watch the live conversation in the Chat tab. Switch to Data for real-time metrics — response times, word counts, and per-message model info. Use the Export button to download a .txt transcript or .csv file for analysis.',
-    side: 'bottom',
+    title: 'Advanced Features',
+    description: "Open Advanced Settings to control the conversation flow: set how many messages each bot sends, add delays, repeat runs, use asymmetric roles, or set stop keywords. During a conversation, switch between the Chat and Data tabs — export a .csv with per-message timing, word counts, and model metadata.",
   },
   {
     target: null,
     title: "You're all set!",
-    description: "Configure your two bots and fire off your first AI-to-AI conversation. Your sessions are saved automatically — access them any time from the History button in the top bar.",
+    description: "Configure your two bots and fire off your first AI-to-AI conversation. Your sessions are saved automatically — access them any time from the History button in the top bar. API keys are stored in Settings (gear icon).",
   },
 ];
 
@@ -252,6 +240,11 @@ export function OnboardingTour({ onComplete }: OnboardingTourProps) {
       return;
     }
     setMeasuring(true);
+    // Scroll the target into view so it's not off-screen
+    const targetEl = document.querySelector(currentStep.target!);
+    if (targetEl) {
+      targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
     const timer = setTimeout(() => {
       const el = document.querySelector(currentStep.target!);
       const r = el ? el.getBoundingClientRect() : null;
@@ -263,7 +256,7 @@ export function OnboardingTour({ onComplete }: OnboardingTourProps) {
         setTooltipPos(null);
       }
       setMeasuring(false);
-    }, 80);
+    }, 350);
     return timer;
   }, [currentStep, computeTooltipPos]);
 
