@@ -6,13 +6,14 @@ import { supabase } from '../lib/supabase';
 import { loadVault } from '../lib/apiKeyVault';
 import { hashString } from '../lib/hash';
 import type { AIModel, Message, ChatConfig } from '../types';
-import { X } from 'lucide-react';
 import { Header } from './Header';
+import type { AppView } from './Header';
 import { ErrorDisplay } from './ErrorDisplay';
 import { ChatPanel } from './ChatPanel';
 import { ScenarioCards } from './ScenarioCards';
 import type { Scenario } from './ScenarioCards';
-import { AIConfigPanel } from './AIConfigPanel';
+import { Dashboard } from './Dashboard';
+import { SetupPage } from './SetupPage';
 import { UserSettings } from './UserSettings';
 import { ConversationHistory } from './ConversationHistory';
 import { ExperimentsPanel, type Experiment } from './ExperimentsPanel';
@@ -68,7 +69,11 @@ export function ResearchInterface({
 }: ResearchInterfaceProps) {
   const saved = loadSettings();
 
-  const [showSettings, setShowSettings] = useState(true);
+  // View routing: dashboard → setup → chat
+  const [currentView, setCurrentView] = useState<AppView>(() => {
+    if (workshopData || sharedConfig) return 'setup';
+    return 'dashboard';
+  });
   const [showUserSettings, setShowUserSettings] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [showExperiments, setShowExperiments] = useState(false);
@@ -186,6 +191,7 @@ export function ResearchInterface({
   useEffect(() => {
     if (!workshopData || workshopAppliedRef.current) return;
     workshopAppliedRef.current = true;
+    if (currentView === 'dashboard') setCurrentView('setup');
 
     if (workshopData.scenario) {
       const s = workshopData.scenario;
@@ -214,7 +220,7 @@ export function ResearchInterface({
       setApiKey1(workshopData.apiKey);
       setApiKey2(workshopData.apiKey);
     }
-  }, [workshopData]);
+  }, [workshopData]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // SPEC-06: share-link copied toast
   const [shareCopied, setShareCopied] = useState(false);
@@ -542,6 +548,7 @@ export function ResearchInterface({
 
     isStoppedRef.current = false;
     setIsLoading(true);
+    setCurrentView('chat');
     setInteractionCount(0);
     setRepetitionCurrent(0);
     repetitionCurrentRef.current = 0;
@@ -877,21 +884,26 @@ export function ResearchInterface({
     messages.filter(m => m.conversationId).map(m => m.conversationId!)
   )];
 
+  const handleNavigateBack = () => {
+    if (currentView === 'chat') setCurrentView('setup');
+    else if (currentView === 'setup') setCurrentView('dashboard');
+    else onBack();
+  };
+
   return (
     <div className="h-screen bg-gray-100 dark:bg-gray-950 flex flex-col overflow-hidden">
       {showTour && <OnboardingTour onComplete={() => setShowTour(false)} />}
       {workshopData && <WorkshopBanner name={workshopData.name} welcome={workshopData.welcome} />}
       <Header
-        onBack={onBack}
+        currentView={currentView}
+        onNavigateBack={handleNavigateBack}
         onSignOut={onSignOut}
-        onToggleSettings={() => setShowSettings(!showSettings)}
         onOpenUserSettings={() => setShowUserSettings(true)}
         onOpenHistory={() => setShowHistory(true)}
         onOpenExperiments={() => setShowExperiments(true)}
         onOpenWorkshops={() => setShowWorkshopAdmin(true)}
         onOpenAdmin={() => setShowAdminDashboard(true)}
         isOrganizer={isOrganizer}
-        showSettings={showSettings}
         user={user}
         isDarkMode={isDarkMode}
         onToggleDarkMode={onToggleDarkMode}
@@ -920,7 +932,7 @@ export function ResearchInterface({
         <ConversationHistory
           userId={user.id}
           onClose={() => setShowHistory(false)}
-          onLoad={(loaded) => setMessages(loaded)}
+          onLoad={(loaded) => { setMessages(loaded); setCurrentView('chat'); }}
         />
       )}
 
@@ -928,7 +940,7 @@ export function ResearchInterface({
         <ExperimentsPanel
           userId={user.id}
           onClose={() => setShowExperiments(false)}
-          onLoad={handleLoadExperiment}
+          onLoad={(exp) => { handleLoadExperiment(exp); setCurrentView('setup'); }}
         />
       )}
 
@@ -989,104 +1001,62 @@ export function ResearchInterface({
         </div>
       )}
 
-      {/* Mobile settings overlay */}
-      {showSettings && (
-        <div className="lg:hidden fixed inset-0 z-40 bg-gray-50 dark:bg-gray-900 flex flex-col overflow-hidden">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
-            <h2 className="text-sm font-semibold text-gray-900 dark:text-white">Bot Configuration</h2>
-            <button
-              onClick={() => setShowSettings(false)}
-              className="p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-              aria-label="Close settings"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-          <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-6">
-            <AIConfigPanel
-              title={botName1}
-              onTitleChange={setBotName1}
-              model={model1}
-              onModelChange={setModel1}
-              apiKey={apiKey1}
-              onApiKeyChange={setApiKey1}
-              orgId={orgId1}
-              onOrgIdChange={setOrgId1}
-              modelVersion={modelVersion1}
-              onModelVersionChange={setModelVersion1}
-              temperature={temperature1}
-              onTemperatureChange={setTemperature1}
-              maxTokens={maxTokens1}
-              onMaxTokensChange={setMaxTokens1}
-              systemPrompt={systemPrompt1}
-              onSystemPromptChange={setSystemPrompt1}
-              bubbleColor={bubbleColor1}
-              onBubbleColorChange={setBubbleColor1}
-              textColor={textColor1}
-              onTextColorChange={setTextColor1}
-              userId={user.id}
-              botSlot={1}
-            />
-            <AIConfigPanel
-              title={botName2}
-              onTitleChange={setBotName2}
-              model={model2}
-              onModelChange={setModel2}
-              apiKey={apiKey2}
-              onApiKeyChange={setApiKey2}
-              orgId={orgId2}
-              onOrgIdChange={setOrgId2}
-              modelVersion={modelVersion2}
-              onModelVersionChange={setModelVersion2}
-              temperature={temperature2}
-              onTemperatureChange={setTemperature2}
-              maxTokens={maxTokens2}
-              onMaxTokensChange={setMaxTokens2}
-              systemPrompt={systemPrompt2}
-              onSystemPromptChange={setSystemPrompt2}
-              bubbleColor={bubbleColor2}
-              onBubbleColorChange={setBubbleColor2}
-              textColor={textColor2}
-              onTextColorChange={setTextColor2}
-              userId={user.id}
-              botSlot={2}
-            />
-          </div>
-        </div>
+      {/* === VIEW ROUTING === */}
+
+      {currentView === 'dashboard' && (
+        <Dashboard
+          userId={user.id}
+          onNewConversation={() => setCurrentView('setup')}
+          onLoadExperiment={(exp) => { handleLoadExperiment(exp); setCurrentView('setup'); }}
+          onLoadScenario={(s) => { handleLoadScenario(s); setCurrentView('setup'); }}
+          onOpenHistory={() => setShowHistory(true)}
+          onOpenExperiments={() => setShowExperiments(true)}
+        />
       )}
 
-      <main className="flex-1 min-h-0 w-full px-2 sm:px-4 lg:px-6 py-3 overflow-hidden">
-        <div className="flex gap-3 h-full min-h-0">
-          {showSettings && (
-            <div data-tour="bot1-panel" className="hidden lg:flex lg:flex-col flex-shrink-0 overflow-y-auto" style={{ width: '19rem' }}>
-              <AIConfigPanel
-                title={botName1}
-                onTitleChange={setBotName1}
-                model={model1}
-                onModelChange={setModel1}
-                apiKey={apiKey1}
-                onApiKeyChange={setApiKey1}
-                orgId={orgId1}
-                onOrgIdChange={setOrgId1}
-                modelVersion={modelVersion1}
-                onModelVersionChange={setModelVersion1}
-                temperature={temperature1}
-                onTemperatureChange={setTemperature1}
-                maxTokens={maxTokens1}
-                onMaxTokensChange={setMaxTokens1}
-                systemPrompt={systemPrompt1}
-                onSystemPromptChange={setSystemPrompt1}
-                bubbleColor={bubbleColor1}
-                onBubbleColorChange={setBubbleColor1}
-                textColor={textColor1}
-                onTextColorChange={setTextColor1}
-                userId={user.id}
-                botSlot={1}
-              />
-            </div>
-          )}
+      {currentView === 'setup' && (
+        <SetupPage
+          botName1={botName1} onBotName1Change={setBotName1}
+          model1={model1} onModel1Change={setModel1}
+          apiKey1={apiKey1} onApiKey1Change={setApiKey1}
+          orgId1={orgId1} onOrgId1Change={setOrgId1}
+          modelVersion1={modelVersion1} onModelVersion1Change={setModelVersion1}
+          temperature1={temperature1} onTemperature1Change={setTemperature1}
+          maxTokens1={maxTokens1} onMaxTokens1Change={setMaxTokens1}
+          systemPrompt1={systemPrompt1} onSystemPrompt1Change={setSystemPrompt1}
+          bubbleColor1={bubbleColor1} onBubbleColor1Change={setBubbleColor1}
+          textColor1={textColor1} onTextColor1Change={setTextColor1}
+          botName2={botName2} onBotName2Change={setBotName2}
+          model2={model2} onModel2Change={setModel2}
+          apiKey2={apiKey2} onApiKey2Change={setApiKey2}
+          orgId2={orgId2} onOrgId2Change={setOrgId2}
+          modelVersion2={modelVersion2} onModelVersion2Change={setModelVersion2}
+          temperature2={temperature2} onTemperature2Change={setTemperature2}
+          maxTokens2={maxTokens2} onMaxTokens2Change={setMaxTokens2}
+          systemPrompt2={systemPrompt2} onSystemPrompt2Change={setSystemPrompt2}
+          bubbleColor2={bubbleColor2} onBubbleColor2Change={setBubbleColor2}
+          textColor2={textColor2} onTextColor2Change={setTextColor2}
+          userInput={userInput} onUserInputChange={setUserInput}
+          autoInteract={autoInteract} onAutoInteractChange={setAutoInteract}
+          maxInteractions={maxInteractions} onMaxInteractionsChange={setMaxInteractions}
+          responseDelay={responseDelay} onResponseDelayChange={setResponseDelay}
+          delayVariance={delayVariance} onDelayVarianceChange={setDelayVariance}
+          repetitionCount={repetitionCount} onRepetitionCountChange={setRepetitionCount}
+          chatMode={chatMode} onChatModeChange={setChatMode}
+          saveHistory={saveHistory} onSaveHistoryChange={setSaveHistory}
+          botMode={botMode} onBotModeChange={setBotMode}
+          openingMessage={openingMessage} onOpeningMessageChange={setOpeningMessage}
+          stopKeywords={stopKeywords} onStopKeywordsChange={setStopKeywords}
+          onStartConversation={handleSendMessage}
+          onLoadScenario={handleLoadScenario}
+          isLoading={isLoading}
+          userId={user.id}
+        />
+      )}
 
-          <div className="flex-1 flex flex-col gap-2 min-w-0 min-h-0 overflow-hidden">
+      {currentView === 'chat' && (
+        <main className="flex-1 min-h-0 w-full px-2 sm:px-4 lg:px-6 py-3 overflow-hidden">
+          <div className="flex-1 flex flex-col gap-2 min-w-0 min-h-0 overflow-hidden h-full">
             <ErrorDisplay errors={errors} onClear={() => setErrors([])} />
             <ChatPanel
               messages={messages}
@@ -1120,7 +1090,6 @@ export function ResearchInterface({
               bubbleColor2={bubbleColor2}
               textColor1={textColor1}
               textColor2={textColor2}
-              // Research features
               sessionId={sessionId}
               conditionLabel={conditionLabel}
               botMode={botMode}
@@ -1139,37 +1108,8 @@ export function ResearchInterface({
               scenarioCards={messages.length === 0 ? <ScenarioCards onSelect={handleLoadScenario} /> : undefined}
             />
           </div>
-
-          {showSettings && (
-            <div data-tour="bot2-panel" className="hidden lg:flex lg:flex-col flex-shrink-0 overflow-y-auto" style={{ width: '19rem' }}>
-              <AIConfigPanel
-                title={botName2}
-                onTitleChange={setBotName2}
-                model={model2}
-                onModelChange={setModel2}
-                apiKey={apiKey2}
-                onApiKeyChange={setApiKey2}
-                orgId={orgId2}
-                onOrgIdChange={setOrgId2}
-                modelVersion={modelVersion2}
-                onModelVersionChange={setModelVersion2}
-                temperature={temperature2}
-                onTemperatureChange={setTemperature2}
-                maxTokens={maxTokens2}
-                onMaxTokensChange={setMaxTokens2}
-                systemPrompt={systemPrompt2}
-                onSystemPromptChange={setSystemPrompt2}
-                bubbleColor={bubbleColor2}
-                onBubbleColorChange={setBubbleColor2}
-                textColor={textColor2}
-                onTextColorChange={setTextColor2}
-                userId={user.id}
-                botSlot={2}
-              />
-            </div>
-          )}
-        </div>
-      </main>
+        </main>
+      )}
     </div>
   );
 }
