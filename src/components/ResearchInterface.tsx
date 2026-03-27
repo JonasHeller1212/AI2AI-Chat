@@ -897,6 +897,7 @@ export function ResearchInterface({
       <Header
         currentView={currentView}
         onNavigateBack={handleNavigateBack}
+        onNavigateHome={() => setCurrentView('dashboard')}
         onSignOut={onSignOut}
         onOpenUserSettings={() => setShowUserSettings(true)}
         onOpenHistory={() => setShowHistory(true)}
