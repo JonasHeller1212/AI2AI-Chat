@@ -902,9 +902,6 @@ export function ResearchInterface({
         onOpenUserSettings={() => setShowUserSettings(true)}
         onOpenHistory={() => setShowHistory(true)}
         onOpenExperiments={() => setShowExperiments(true)}
-        onOpenWorkshops={() => setShowWorkshopAdmin(true)}
-        onOpenAdmin={() => setShowAdminDashboard(true)}
-        isOrganizer={isOrganizer}
         user={user}
         isDarkMode={isDarkMode}
         onToggleDarkMode={onToggleDarkMode}
@@ -918,6 +915,9 @@ export function ResearchInterface({
           onDataDeleted={() => { setMessages([]); setShowUserSettings(false); }}
           onAccountDeleted={() => { onSignOut(); }}
           onRewatchTour={() => { resetTourDismissed(); incrementTourCount(); setShowTour(true); }}
+          isOrganizer={isOrganizer}
+          onOpenWorkshops={() => { setShowUserSettings(false); setShowWorkshopAdmin(true); }}
+          onOpenAdmin={() => { setShowUserSettings(false); setShowAdminDashboard(true); }}
         />
       )}
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
-import { X, Settings, User as UserIcon, Mail, Lock, Save, Clock, Trash2, KeyRound, PlayCircle, GraduationCap, Ticket } from 'lucide-react';
+import { X, Settings, User as UserIcon, Mail, Lock, Save, Clock, Trash2, KeyRound, PlayCircle, GraduationCap, Ticket, BarChart3 } from 'lucide-react';
 import { loadVault, saveVault, clearVault, type ProviderVault } from '../lib/apiKeyVault';
 
 interface UserSettingsProps {
@@ -11,9 +11,12 @@ interface UserSettingsProps {
   onDataDeleted?: () => void;
   onAccountDeleted?: () => void;
   onRewatchTour?: () => void;
+  isOrganizer?: boolean;
+  onOpenWorkshops?: () => void;
+  onOpenAdmin?: () => void;
 }
 
-export function UserSettings({ user, onClose, onOpenHistory, onDataDeleted, onAccountDeleted, onRewatchTour }: UserSettingsProps) {
+export function UserSettings({ user, onClose, onOpenHistory, onDataDeleted, onAccountDeleted, onRewatchTour, isOrganizer, onOpenWorkshops, onOpenAdmin }: UserSettingsProps) {
   const [displayName, setDisplayName] = useState(user.user_metadata?.display_name ?? '');
   const [email, setEmail] = useState(user.email ?? '');
   const [newPassword, setNewPassword] = useState('');
@@ -217,6 +220,37 @@ export function UserSettings({ user, onClose, onOpenHistory, onDataDeleted, onAc
                   <span>Rewatch App Tour</span>
                 </div>
                 <span className="text-xs text-gray-400 dark:text-gray-500">Replay the onboarding tour →</span>
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Admin: Analytics & Workshops */}
+        {isOrganizer && (onOpenAdmin || onOpenWorkshops) && (
+          <div className="px-6 pb-4 pt-2 space-y-2">
+            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Organizer Tools</p>
+            {onOpenAdmin && (
+              <button
+                onClick={() => { onOpenAdmin(); onClose(); }}
+                className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 hover:border-orange-300 dark:hover:border-orange-500 hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors text-sm"
+              >
+                <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                  <BarChart3 className="w-4 h-4 text-orange-500 dark:text-orange-400" />
+                  <span>Analytics Dashboard</span>
+                </div>
+                <span className="text-xs text-gray-400 dark:text-gray-500">Usage stats & insights →</span>
+              </button>
+            )}
+            {onOpenWorkshops && (
+              <button
+                onClick={() => { onOpenWorkshops(); onClose(); }}
+                className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 hover:border-sky-300 dark:hover:border-sky-500 hover:bg-sky-50 dark:hover:bg-sky-900/20 transition-colors text-sm"
+              >
+                <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                  <GraduationCap className="w-4 h-4 text-sky-500 dark:text-sky-400" />
+                  <span>Workshop Manager</span>
+                </div>
+                <span className="text-xs text-gray-400 dark:text-gray-500">Create & manage workshops →</span>
               </button>
             )}
           </div>
