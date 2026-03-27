@@ -1,6 +1,6 @@
 import React from 'react';
 import type { User } from '@supabase/supabase-js';
-import { Settings, SlidersHorizontal, ArrowLeft, UserCircle, Clock, Moon, Sun, FlaskConical, GraduationCap, BarChart3, Home } from 'lucide-react';
+import { Settings, SlidersHorizontal, ArrowLeft, UserCircle, Clock, Moon, Sun, FlaskConical, Home } from 'lucide-react';
 import { Logo } from './Logo';
 
 export type AppView = 'dashboard' | 'setup' | 'chat';
@@ -13,9 +13,6 @@ interface HeaderProps {
   onOpenUserSettings: () => void;
   onOpenHistory: () => void;
   onOpenExperiments: () => void;
-  onOpenWorkshops?: () => void;
-  onOpenAdmin?: () => void;
-  isOrganizer?: boolean;
   user: User;
   isDarkMode: boolean;
   onToggleDarkMode: () => void;
@@ -24,7 +21,6 @@ interface HeaderProps {
 export function Header({
   currentView, onNavigateBack, onNavigateHome, onSignOut,
   onOpenUserSettings, onOpenHistory, onOpenExperiments,
-  onOpenWorkshops, onOpenAdmin, isOrganizer,
   user, isDarkMode, onToggleDarkMode,
 }: HeaderProps) {
   const displayName = user.user_metadata?.display_name || user.email?.split('@')[0] || 'Account';
@@ -66,20 +62,6 @@ export function Header({
           )}
         </div>
         <div className="flex items-center gap-1.5">
-          {isOrganizer && onOpenAdmin && (
-            <button onClick={onOpenAdmin} aria-label="Admin dashboard" title="Admin dashboard"
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 rounded-lg transition-all shadow-sm">
-              <BarChart3 className="w-3.5 h-3.5" />
-              <span className="hidden sm:block">Analytics</span>
-            </button>
-          )}
-          {isOrganizer && onOpenWorkshops && (
-            <button onClick={onOpenWorkshops} aria-label="Workshop manager" title="Workshop manager"
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-gradient-to-r from-sky-500 to-sky-600 hover:from-sky-400 hover:to-sky-500 rounded-lg transition-all shadow-sm">
-              <GraduationCap className="w-3.5 h-3.5" />
-              <span className="hidden sm:block">Workshops</span>
-            </button>
-          )}
           {currentView !== 'dashboard' && (
             <button onClick={onOpenExperiments} data-tour="experiments-btn" aria-label="Saved experiments" title="Saved experiments"
               className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors">
