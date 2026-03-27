@@ -786,6 +786,8 @@ export function ResearchInterface({
     const csvField = (val: string) => {
       let s = String(val);
       if (s.match(/^[=+\-@]/)) s = `'${s}`;
+      // Replace newlines with spaces to prevent breaking CSV row boundaries
+      s = s.replace(/\r\n/g, ' ').replace(/[\r\n]/g, ' ');
       return `"${s.replace(/"/g, '""')}"`;
     };
 
@@ -1105,7 +1107,7 @@ export function ResearchInterface({
               onDownloadConfigJson={handleDownloadConfigJson}
               currentExperimentName={currentExperimentName || undefined}
               onDetachExperiment={currentExperimentId ? () => { setCurrentExperimentId(null); setCurrentExperimentName(''); } : undefined}
-              runTokens={!isLoading && runTokens.length > 0 ? runTokens : undefined}
+              runTokens={sessionId && !isLoading && runTokens.length > 0 ? runTokens : undefined}
               scenarioCards={messages.length === 0 ? <ScenarioCards onSelect={handleLoadScenario} /> : undefined}
             />
           </div>
