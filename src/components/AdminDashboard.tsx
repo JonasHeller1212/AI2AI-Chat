@@ -122,8 +122,8 @@ export function AdminDashboard({ onClose }: AdminDashboardProps) {
               {/* Stat cards */}
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 <StatCard icon={<Users className="w-4 h-4" />} label="Total Users" value={stats.totalUsers} />
-                <StatCard icon={<MessageSquare className="w-4 h-4" />} label="Conversations" value={stats.totalConversations} />
-                <StatCard icon={<MessageSquare className="w-4 h-4" />} label="Messages" value={stats.totalMessages} />
+                <StatCard icon={<MessageSquare className="w-4 h-4" />} label="Conversations" value={stats.totalConversations} sub="started" />
+                <StatCard icon={<MessageSquare className="w-4 h-4" />} label="Messages" value={stats.totalMessages} sub="individual bot + user msgs" />
                 <StatCard icon={<FlaskConical className="w-4 h-4" />} label="Experiments" value={stats.totalExperiments} />
                 <StatCard
                   icon={<GraduationCap className="w-4 h-4" />}
