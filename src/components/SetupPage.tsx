@@ -57,9 +57,9 @@ export function SetupPage(props: SetupPageProps) {
     <div className="flex-1 overflow-y-auto">
       <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
 
-        {/* Bot configuration panels */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <div data-tour="bot1-panel">
+        {/* Bot configuration panels — dual laboratory instruments */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <div data-tour="bot1-panel" className="relative before:absolute before:left-0 before:top-4 before:bottom-4 before:w-1 before:rounded-full before:bg-lab-primary/30">
             <AIConfigPanel
               title={props.botName1}
               onTitleChange={props.onBotName1Change}
@@ -85,7 +85,7 @@ export function SetupPage(props: SetupPageProps) {
               botSlot={1}
             />
           </div>
-          <div data-tour="bot2-panel">
+          <div data-tour="bot2-panel" className="relative before:absolute before:left-0 before:top-4 before:bottom-4 before:w-1 before:rounded-full before:bg-lab-accent/30">
             <AIConfigPanel
               title={props.botName2}
               onTitleChange={props.onBotName2Change}
@@ -114,7 +114,7 @@ export function SetupPage(props: SetupPageProps) {
         </div>
 
         {/* Scenario prompt */}
-        <div data-tour="chat-input" className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
+        <div data-tour="chat-input" className="lab-panel p-5">
           <div className="flex items-center gap-1.5 mb-2">
             <label className="text-sm font-medium text-gray-700 dark:text-gray-200">Scenario Prompt</label>
             <InfoTooltip text="Set the stage for the AI conversation. Describe a scenario, pose a question, or provide context that both bots will use as their starting point." />
@@ -125,15 +125,15 @@ export function SetupPage(props: SetupPageProps) {
             value={props.userInput}
             onChange={(e) => props.onUserInputChange(e.target.value)}
             placeholder="Describe a scenario, pose a question, or leave blank to let the system prompts guide the conversation..."
-            className="w-full p-2.5 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 resize-y min-h-[120px] focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            className="w-full p-3 border border-lab-border dark:border-gray-600 rounded-lab-btn text-sm font-mono bg-lab-bg dark:bg-gray-700 text-lab-heading dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 resize-y min-h-[120px] focus:ring-2 focus:ring-lab-primary focus:border-transparent"
           />
         </div>
 
         {/* Advanced settings (collapsed by default) */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+        <div className="lab-panel">
           <button
             onClick={() => setShowAdvanced(!showAdvanced)}
-            className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-750 rounded-lg transition-colors"
+            className="w-full flex items-center justify-between px-5 py-3 text-sm font-medium text-lab-heading dark:text-gray-200 hover:bg-lab-bg dark:hover:bg-gray-750 rounded-lab-card transition-colors"
           >
             <span>Advanced Settings</span>
             {showAdvanced ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
@@ -250,7 +250,7 @@ export function SetupPage(props: SetupPageProps) {
           <button
             onClick={props.onStartConversation}
             disabled={props.isLoading}
-            className="inline-flex items-center gap-2 px-8 py-3 text-sm font-medium text-white bg-gradient-to-r from-orange-500 to-sky-500 rounded-xl hover:from-orange-400 hover:to-sky-400 disabled:opacity-50 disabled:cursor-not-allowed shadow-md transition-all"
+            className="inline-flex items-center gap-2 px-8 py-3 text-sm font-heading font-semibold text-white bg-lab-primary rounded-lab-btn hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed shadow-lab-soft transition-all"
           >
             <Send className="w-4 h-4" />
             Start Conversation
