@@ -5,13 +5,15 @@ export function Logo() {
   return (
     <div className="flex items-center">
       <div className="relative flex items-center">
-        <Bot className="h-7 w-7 text-orange-500" />
-        <Bot className="h-7 w-7 text-sky-500 -ml-2" />
+        <Bot className="h-7 w-7 text-lab-primary" />
+        <Bot className="h-7 w-7 text-lab-accent -ml-2" />
       </div>
-      <span className="ml-2 text-xl font-bold bg-gradient-to-r from-orange-500 to-sky-500 text-transparent bg-clip-text">
+      <span className="ml-2 text-xl font-heading font-bold text-lab-heading dark:text-white">
         AI2AI-Chat
       </span>
-      <span className="ml-2 text-sm text-gray-600">Research Platform</span>
+      <span className="ml-2 text-xs font-medium text-lab-body dark:text-gray-400 tracking-wide uppercase">
+        Research Lab
+      </span>
     </div>
   );
 }
